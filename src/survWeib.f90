@@ -3,25 +3,26 @@
 !                                 Weibull
 !                              20/05/10
 !            last              08/04/11
-        subroutine survWeib(entrytime,l,r,status,x,n,p,truncated,interval,eps,&
-        maxiter0,loglik,basepar,regpar,v,converged,cv,niter,t,S,S_l,S_u,h,h_l,h_u,prt,hess_tot)
+        subroutine survWeib(entrytime,l,r,status,x,n,p,truncated,interval,eps,maxiter0,&
+        loglik,basepar,regpar,v,converged,cv,niter,t,S,S_l,S_u,h,h_l,h_u,conf_bands,prt,hess_tot)
 !noVar
         use survCommun  
         use parameters
         use optim
-        use commun,only:pl
+        use commun,only:pl,iconf
         
         implicit none
 
 !  variables entrants
-        integer,intent(in)::n,p,prt
+        integer,intent(in)::n,p,prt,conf_bands
         double precision,dimension(n),intent(in)::l,r,entrytime
         integer,dimension(n),intent(in)::status
         double precision,dimension(n,p),intent(in)::x
         integer,intent(in)::truncated,interval,maxiter0
         integer,dimension(3),intent(in)::eps
 !  variables sortant
-        integer,intent(out)::converged,niter
+        integer,dimension(2),intent(out)::converged
+        integer,intent(out)::niter
 ! istop 
         double precision,dimension(p),intent(out)::regpar
         double precision,dimension(100),intent(out)::t,S,S_l,S_u,h,h_l,h_u       
@@ -58,6 +59,7 @@
 !---------------------------------
         pl=0
         print_iter = prt
+	iconf = conf_bands
         no=N
         
         if(noVar.ne.1) then
@@ -76,7 +78,7 @@
         maxiter = maxiter0
 
         som = 0.d0
-        ts =0.d0
+        ts = 0.d0
 
         min = l(1)
         max = l(1)
@@ -195,9 +197,12 @@
         nva=0
         call marq98(b,np,niter,v1,res,ier,istop,ca,cb,dd,survLikelihood)
         
-        if (istop.ne.1) goto 1000
+        if (istop.ne.1)then ! goto 1000
+           b(1) = 1.d0
+           b(2) = dsqrt(som/ts)
+        endif
+        converged(1) = istop
         loglik(1) = res
-
         
         if(noVar.ne.1) then
                 nva=p
@@ -212,13 +217,14 @@
                 niter=0
 !               write(*,*)'second call of marquardt '
                 call marq98(b,np,niter,v1,res,ier,istop,ca,cb,dd,survLikelihood)
-                
+                loglik(2) = res
+                converged(2)=istop
                 if (istop.ne.1) goto 1000
 !c           write(*,*)'niter2',niter
                 do i=npw+1,np
                         regpar(i-npw) = b(i)
                 end do 
-                loglik(2) = res
+                
         else
                 regpar=0.d0
                 loglik(2) = 0.d0
@@ -306,6 +312,7 @@
 
 !---------------- bootstrap ------------------------------
 
+		if (iconf.eq.1)then
                 do jj=1,2000
                         do i=1,np
                                 call bgos(1.d0,0,x1,x2,0.d0)
@@ -425,9 +432,15 @@
                         h_u(k) = tab_ri_s(1)
 
                 end do  
+	else 
+		S_l=0
+		S_u=0
+		h_l=0
+		h_u=0
+	end if
 
 1000    continue
-        converged = istop
+!        converged = istop
         deallocate(t0,t1,t2,ve,c)
 
         end subroutine survWeib

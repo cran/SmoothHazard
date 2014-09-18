@@ -1,4 +1,3 @@
-
 !================ Distance pour idmPl
 
         subroutine distance(nz01,nz02,nz12,b,t,a01,a01_l,a01_u,a02,a02_l,a02_u,a12,a12_l,a12_u)
@@ -97,11 +96,11 @@
         h1 = (zi01(nz01)-zi01(1))*0.01d0
         x1 = zi01(1)
 
-        h2 = (zi12(nz12)-zi12(1))*0.01d0
-        x2 = zi12(1)
+        h2 = (zi02(nz02)-zi02(1))*0.01d0
+        x2 = zi02(1)
 
-        h3 = (zi02(nz02)-zi02(1))*0.01d0
-        x3 = zi02(1)
+        h3 = (zi12(nz12)-zi12(1))*0.01d0
+        x3 = zi12(1)
 
         do i=1,99
                 x1 = x1 + h1
@@ -121,10 +120,30 @@
                 a01(i)=lam
                 a01_l(i)=lbinf
                 a01_u(i)=lbsup
-! 1------->2
+
+! 0------->2            
                 x2 = x2 + h2
-                t(i,2)=x2       
-                call cosp(x2,the12,nz12+2,hes12,zi12,binf,su,bsup,lbinf,lam,lbsup)
+                t(i,2) = x2
+                call cosp(x2,the02,nz02+2,hes02,zi02,binf,su,bsup,lbinf,lam,lbsup)
+
+                if(binf.lt.0.d0)then
+                        binf = 0.d0
+                endif
+                if(bsup.gt.1.d0)then
+                        bsup = 1.d0
+                endif
+                if(lbinf.lt.0.d0)then
+                        lbinf = 0.d0
+                endif
+
+                a02(i) = lam
+                a02_l(i) = lbinf
+                a02_u(i) = lbsup    
+
+! 1------->2
+                x3 = x3 + h3
+                t(i,3)=x3       
+                call cosp(x3,the12,nz12+2,hes12,zi12,binf,su,bsup,lbinf,lam,lbsup)
                 
                 if(binf.lt.0.d0)then
                         binf = 0.d0
@@ -139,25 +158,7 @@
                 a12(i)=lam
                 a12_l(i)=lbinf
                 a12_u(i)=lbsup   
-                     
-! 0------->2            
-                x3 = x3 + h3
-                t(i,3) = x3
-                call cosp(x3,the02,nz02+2,hes02,zi02,binf,su,bsup,lbinf,lam,lbsup)
-
-                if(binf.lt.0.d0)then
-                        binf = 0.d0
-                endif
-                if(bsup.gt.1.d0)then
-                        bsup = 1.d0
-                endif
-                if(lbinf.lt.0.d0)then
-                        lbinf = 0.d0
-                endif
-
-                a02(i) = lam
-                a02_l(i) = lbinf
-                a02_u(i) = lbsup         
+                          
         end do
 
         end subroutine distance
@@ -315,6 +316,8 @@
 !==========================  COSP  ====================================
         subroutine cosp(x,the,n,y,zi,binf,su,bsup,lbinf,lam,lbsup)
        
+	use commun,only:iconf
+
         implicit none
       
         integer::k,j,n,i
@@ -391,17 +394,21 @@
                         gl = som
             endif
 
-         
-   
-         call conf(x,j,n,y,pm,zi)
+        su  = dexp(-gl)
 
-         binf = dexp(-gl + 1.96d0*pm)
-         su  = dexp(-gl)
-         bsup = dexp(-gl - 1.96d0*pm)
-
-         call conf1(x,j,n,y,pm,zi)
-         lbinf = lam - 1.96d0*pm
-         lbsup = lam + 1.96d0*pm
+   	if (iconf.eq.1) then
+         	call conf(x,j,n,y,pm,zi)
+         	binf = dexp(-gl + 1.96d0*pm)
+         	bsup = dexp(-gl - 1.96d0*pm)
+         	call conf1(x,j,n,y,pm,zi)
+         	lbinf = lam - 1.96d0*pm
+         	lbsup = lam + 1.96d0*pm
+	else
+		binf=0
+		bsup=0
+		lbinf=0
+		lbsup=0
+	end if
 	
          return
 

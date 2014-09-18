@@ -1,3 +1,48 @@
+#' Plot method for a survival model.
+#' 
+#' Plot estimated baseline survival function from an object of class
+#' \code{shr}. Pointwise confidence limits are available.
+#' 
+#' 
+#' @param x a \code{shrWeib} or a \code{shrSplines} class object (output from
+#' calling \code{\link{shr}} function).
+#' @param type type of function to plot. The default is "shr".
+#' @param add boolean.
+#' @param newdata newdata.
+#' @param cause cause.
+#' @param col col.
+#' @param lty lty.
+#' @param lwd lwd.
+#' @param ylim ylim.
+#' @param xlim xlim.
+#' @param xlab xlab.
+#' @param ylab ylab.
+#' @param legend legend.
+#' @param confint confint.
+#' @param timeOrigin timeOrigin.
+#' @param axes axes.
+#' @param percent percent.
+#' @param \dots other graphical parameters.
+#' @return Print a plot of a suvival model.
+#' @author R: Celia Touraine <Celia.Touraine@@isped.u-bordeaux2.fr> Fortran:
+#' Pierre Joly <Pierre.Joly@@isped.u-bordeaux2.fr>
+#' @seealso \code{\link{plot.shr}}
+#' @keywords methods
+#' @examples
+#' 
+#' # Weibull survival model
+#' library(prodlim)
+#' data(testdata)
+#' fit.su <- shr(Hist(time=list(l,r),id)~cov,data=testdata) 
+#' 
+#' # pointwise confidence limits
+#' plot(fit.su)
+#' 
+#' # no pointwise confidence limits
+#' plot(fit.su,confint=FALSE)
+#' 
+#'
+##' @S3method plot shr
 plot.shr <- function(x,type="shr",add = FALSE,newdata=NULL,cause=NULL,col,lty,lwd,
 	ylim,xlim,xlab="Time",ylab,legend=TRUE,confint=TRUE,timeOrigin=0,
 	axes=TRUE,percent=TRUE,...){
@@ -24,7 +69,7 @@ plot.shr <- function(x,type="shr",add = FALSE,newdata=NULL,cause=NULL,col,lty,lw
   legend.DefaultArgs <- list(legend=names(Y),lwd=lwd,col=col,lty=lty,cex=1.5,bty="n",y.intersp=1.3,x="topright")
   confint.DefaultArgs <- list(x=x,newdata=newdata,type=type,citype="shadow",times=plot.times,cause=cause,density=55,col=col[1:nlines],lwd=rep(2,nlines),lty=rep(3,nlines))
   # }}}
-  smartA <- SmartControl(call= list(...),
+  smartA <- prodlim::SmartControl(call= list(...),
                          keys=c("plot","lines","legend","confint","axis1","axis2"),
                          ignore=c("x","type","cause","newdata","add","col","lty","lwd","ylim","xlim","xlab","ylab","legend","marktime","confint","automar","atrisk","timeOrigin","percent","axes","atrisk.args","confint.args","legend.args"),
                          defaults=list("plot"=plot.DefaultArgs,

@@ -1,12 +1,102 @@
+#' Fit a survival model
+#' 
+#' Fit a survival model using either a semi-parametric approach (penalized
+#' likelihood with an approximation of the hazard function by linear
+#' combination of M-splines) or a parametric approach (specifying a Weibull
+#' distribution on the hazard function). Left-truncated, right-censored, and
+#' interval-censored data are allowed.
+#' 
+#' The estimated parameters are obtained using the robust Marquardt algorithm
+#' (Marquardt, 1963) which is a combination between a Newton-Raphson algorithm
+#' and a steepest descent algorithm.
+#' 
+#' @param formula a formula object with the response on the left of a
+#' \eqn{\texttildelow} operator, and the terms on the right. The
+#' response must be a survival object or Hist object as returned by
+#' the 'Surv' or 'Hist' function.
+#' @param data a data frame in which to interpret the variables named
+#' in the \code{formula}.
+#' @param eps a vector of length 3 for the convergence criteria
+#' (criterion for parameters, criterion for likelihood, criterion for
+#' second derivatives). The default is 'c(5,5,3)' and corresponds to
+#' criteria equals to \eqn{10^{-5}}, \eqn{10^{-5}} and \eqn{10^{-3}}.
+#' @param nknots number of knots for the splines to use to approximate
+#' the hazard function. Argument for the penalized likelihood
+#' approach.  The default is 7.
+#' @param CV binary variable equals to 1 when search (by approximated
+#' cross validation) of the smoothing parameter kappa and 0
+#' otherwise. Argument for the penalized likelihood approach. The
+#' default is 0.
+#' @param kappa if CV=FALSE, smoothing parameter; if CV=TRUE, initial
+#' value of the smoothing parameters for the cross validation
+#' search. Argument for the penalized likelihood approach.
+#' @param conf.int Boolean parameter. Equals to \code{TRUE} to
+#' calculate pointwise confidence intervals for the survival or hazard
+#' curves, \code{FALSE} otherwise. Default is \code{TRUE}.
+#' @param maxiter maximum number of iterations. The default is 200.
+#' @param method type of estimation method: "Splines" for a penalized
+#' likelihood approach with approximation of the hazard function by
+#' M-splines, "Weib" for a parametric approach with a Weibull
+#' distribution on the hazard function. Default is "Weib".
+#' @param print.iter boolean parameter. Equals to \code{TRUE} to print
+#' the likelihood during the iteration process, \code{FALSE}
+#' otherwise. Default is \code{FALSE}. This option is not running on
+#' Windows.
+#' @param na.action how NAs are treated. The default is first, any
+#' na.action attribute of data, second a na.action setting of options,
+#' and third 'na.fail' if that is unset. The 'factory-fresh' default
+#' is na.omit. Another possible value is NULL.
+#' @return \item{call}{} \item{coef}{regression parameters.}
+#' \item{loglik}{vector containing the log-likelihood without and with
+#' covariate.} \item{modelPar}{Weibull parameters.} \item{N}{number of
+#' subjects.} \item{NC}{number of covariates.} \item{nevents}{number of
+#' events.} \item{modelResponse}{model response: \code{Hist} or \code{Surv}
+#' object.} \item{converged}{integer equal to 1 when the model converged, 2, 3
+#' or 4 otherwise.} \item{time}{times for which survival and hazard functions
+#' have been evaluated for plotting.} \item{hazard}{matched values of the
+#' hazard function.} \item{lowerHazard}{lower confidence limits for hazard
+#' function.} \item{upperHazard}{upper confidence limits for hazard function.}
+#' \item{surv}{matched values of the survival function.} \item{lowerSurv}{lower
+#' confidence limits for survival function.} \item{upperSurv}{upper confidence
+#' limits for survival function.} \item{RR}{vector of relative risks.}
+#' \item{V}{variance-covariance matrix.} \item{se}{standart errors.}
+#' \item{knots}{knots to approximate by M-splines the hazard function.}
+#' \item{nknots}{number of knots.} \item{CV}{a binary variable equals to 1 when
+#' search of the smoothing parameter \link{kappa} by approximated
+#' cross-validation, 1 otherwise. The default is 0.} \item{niter}{number of
+#' iterations.} \item{cv}{vector containing the convergence criteria.}
+#' \item{na.action}{observations deleted if missing values.}
+#' @author R: Celia Touraine <Celia.Touraine@@isped.u-bordeaux2.fr> Fortran:
+#' Pierre Joly <Pierre.Joly@@isped.u-bordeaux2.fr>
+#' @seealso \code{\link{shr}}, \code{\link{print.shr}},
+#' \code{\link{summary.shr}}, \code{\link{print.shr}},
+#' @references D. Marquardt (1963). An algorithm for least-squares estimation
+#' of nonlinear parameters.  \emph{SIAM Journal of Applied Mathematics},
+#' 431-441.
+#' @keywords methods 
+#' @examples
+#' 
+#' # Weibull survival model
+#' library(prodlim)
+#' data(testdata)
+#' fit.su <- shr(Hist(time=list(l,r),id)~cov,data=testdata,) 
+#' 
+#' ## to print
+#' fit.su
+#' 
+#' ## summary
+#' summary(fit.su)
+#' 
+#' @export shr
 shr <- function(formula,
                  data,
                  eps=c(5,5,3),
                  nknots=7,
-                 irec=0,
-                 kappa0=10000,
-                 igraph=1,
+                 CV=FALSE,
+                 kappa=10000,
+                 conf.int=TRUE,
                  maxiter=200,
-                 hazard="Weib",
+                 method="Weib",
                  print.iter=FALSE,
                  na.action=na.omit){
 
@@ -18,7 +108,7 @@ shr <- function(formula,
   ptm<-proc.time()
   # {{{ process formula and data
   # check if formula is a formula 
-  if(!(hazard %in% c("Weib","Splines"))) stop("The hazard argument must be 'Weib' or 'Splines'")
+  if(!(method %in% c("Weib","Splines"))) stop("The method must be either 'Weib' or 'Splines'")
   # --------------------------------------------------------------------
   formula.names <- try(all.names(formula),silent=TRUE)
   if (!(formula.names[1]=="~")||(match("$",formula.names,nomatch=0)+match("[",formula.names,nomatch=0)>0)){
@@ -96,14 +186,14 @@ shr <- function(formula,
     Ltime <- as.double(event.history[,"time",drop=TRUE])
     Rtime <- rep(0,N)
   }
-	
   id <- event.history[,"status"]
   # }}}
   # {{{ call Fortran function weib and collect results
-  
 
+  # do not give infinite values to fortran
+  Rtime[is.infinite(Rtime)] <- Ltime[is.infinite(Rtime)]
 
-  if (hazard == "Weib"){	
+  if (method == "Weib"){	
     size1 <- NC
     size2 <- size1^2
     size_V <- size1 + 2
@@ -123,7 +213,7 @@ shr <- function(formula,
                      basepar=as.double(rep(0.1,2)),
                      regpar=as.double(rep(0.1,NC)),
                      v=as.double(rep(0,NC*NC)),
-                     converged=as.integer(0),
+                     converged=as.integer(rep(0,2)),
                      cv=as.double(rep(0,3)),
                      niter=as.integer(0),
                      t=as.double(rep(0,100)),
@@ -133,9 +223,10 @@ shr <- function(formula,
                      h=as.double(rep(0,100)),
                      h_l=as.double(rep(0,100)),
                      h_u=as.double(rep(0,100)),
+		     as.integer(conf.int),
                      as.integer(print.iter),
                      V_tot=as.double(matrix(0,nrow=size_V,ncol=size_V)),
-                     package="SmoothHazard")
+                     PACKAGE="SmoothHazard")
   }else{
     size1 <- NC
     size2 <- size1^2
@@ -155,7 +246,7 @@ shr <- function(formula,
                      loglik=as.double(rep(0,2)),
                      regpar=as.double(rep(0.1,NC)),
                      v=as.double(rep(0,NC*NC)),
-                     converged=as.integer(0),
+                     converged=as.integer(rep(0,2)),
                      cv=as.double(rep(0,3)),
                      niter=as.integer(0),
                      t=as.double(rep(0,99)),
@@ -166,17 +257,17 @@ shr <- function(formula,
                      h_l=as.double(rep(0,99)),
                      h_u=as.double(rep(0,99)),
                      as.integer(nknots),
-                     as.integer(irec),
-                     as.double(kappa0),
+                     as.integer(CV),
+                     as.double(kappa),
                      kappa=as.double(0),
-                     as.integer(igraph),
+                     as.integer(conf.int),
                      CVcrit=as.double(0),
                      mdf=as.double(0),
                      ti=as.double(rep(0,(nknots+6))),
                      theta=as.double(rep(0,(nknots+2))),
                      as.integer(print.iter),
                      V_tot=as.double(matrix(0,nrow=size_V,ncol=size_V)),
-                     package="SmoothHazard")
+                     PACKAGE="SmoothHazard")
 
 
 
@@ -190,25 +281,38 @@ shr <- function(formula,
   ## converged 	0=converged,1=invert fails,2=no 	length 1 	integer 	
   ## t 	time to plot S(t) and h(t) 	length 100 	double 	
   ## S 	survival function 	length 100 	double 	
-  ## S_l 	lower confidence band for S 	length 100 	double 	
-  ## S_u 	Upper confidence band for S 	length 100 	double 	
+  ## S_l 	lower confidence limit for S 	length 100 	double 	
+  ## S_u 	Upper confidence limit for S 	length 100 	double 	
   ## h 	hazard function 	length 100 	double 	
-  ## h_l 	lower confidence band for h function 	length 100 	double 	
-  ## h_u 	upper confidence band for h 	length 100 	double 	
+  ## h_l 	lower confidence limit for h function 	length 100 	double 	
+  ## h_u 	upper confidence limit for h 	length 100 	double 	
   
-  if (ffit$converged == 4){
+  if (ffit$converged[1] == 4){
     warning("Problem in the loglikelihood computation. The program stopped abnormally. Please verify your dataset. \n")    
   }
 	
-  if (ffit$converged == 2){
+  if (ffit$converged[1] == 2){
     warning("Model did not converge. Change the 'maxit' parameter")
   }
 
-  if (ffit$converged == 3){
-    warning("Matrix non-positive definite.")
+  if (ffit$converged[1] == 3){
+    warning("Fisher information matrix non-positive definite.")
   }
+  if (ffit$converged[2] != 0){
+     if (ffit$converged[2] == 4){
+      warning("With covariates, problem in the loglikelihood computation. The program stopped abnormally. Please verify your dataset. \n")    
+    }
 
-  if(hazard=="Weib") weibullParameter <- ffit$basepar
+    if (ffit$converged[2] == 2){
+      warning("With covariates, model did not converge. You could change the 'maxit' parameter")
+    }
+
+    if (ffit$converged[2] == 3){
+      warning("With covariates, Fisher information matrix non-positive definite.")
+    }
+  }
+  
+  if(method=="Weib") weibullParameter <- ffit$basepar
 
   # }}}
   # {{{ output 
@@ -218,12 +322,11 @@ shr <- function(formula,
 	
 
   fit$loglik <- ffit$loglik
-  if(hazard=="Weib"){
+  if(method=="Weib"){
     fit$modelPar <- weibullParameter
   }
   fit$N <- N
   fit$NC <- NC
-  fit$events <- sum(id)
   fit$modelResponse <- event.history
   fit$converged <- ffit$converged
   fit$time <- ffit$t
@@ -246,7 +349,7 @@ shr <- function(formula,
     fit$V_cov <- V
   }
   V <- matrix(ffit$V_tot,nrow=size_V,ncol=size_V,byrow=T)
-  if(hazard=="Weib"){
+  if(method=="Weib"){
     colnames(V) <- c("sqrt(a)","sqrt(b)",Xnames)
     rownames(V) <- c("sqrt(a)","sqrt(b)",Xnames)
   }else{
@@ -259,31 +362,25 @@ shr <- function(formula,
   fit$niter <- ffit$niter
   fit$cv <- ffit$cv
 
-  if(hazard=="Splines"){
+  if(method=="Splines"){
     fit$nknots <- nknots
     fit$knots <- ffit$ti
     fit$theta <-  ffit$theta
-    fit$irec <- irec
+    fit$CV <- CV
     fit$igraph <- ffit$igraph
-    if(irec==1){
+    if(CV){
       fit$kappa <- ffit$kappa
       fit$CVcrit <- ffit$CVcrit
       fit$DoF <- ffit$mdf
     }else{
-      fit$kappa <- kappa0
+      fit$kappa <- kappa
     }
 
-  }
+}
   fit$na.action <- na.action
   # }}}
-  if(hazard=="Weib"){
-    class(fit) <- "shrWeib"
-  }else{
-    class(fit) <- "shrPl"
-  }  
-
-
-  cost<-proc.time()-ptm
-  ## cat("The program took", round(cost[3],2), "seconds \n")
+  fit$method <- method
+  class(fit) <- "shr"
+  fit$runtime <- proc.time()-ptm
   fit
 }

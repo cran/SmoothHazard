@@ -6,17 +6,17 @@
 !            last              20/04/11
 !=============================================================================================
         subroutine idmWeib(entrytime,l,r,d,idm,idd,x01,x02,x12,N,P01,P02,P12,truncated,eps &
-                      ,maxiter0,loglik,basepar,regpar,v,converged,cv,&
-                      niter,t,a01,a01_l,a01_u,a02,a02_l,a02_u,a12,a12_l,a12_u,prt,hess_tot) 
+                      ,maxiter0,loglik,basepar,regpar,v,converged,cv,niter,t&
+                      ,a01,a01_l,a01_u,a02,a02_l,a02_u,a12,a12_l,a12_u,conf_bands,prt,hess_tot) 
       
         use idmCommun  
         use parameters
         use optim
-        use commun,only:pl
+        use commun,only:pl,iconf
                 
         implicit none
 !  variables entrants
-        integer,intent(in)::n,p01,p02,p12,prt
+        integer,intent(in)::n,p01,p02,p12,conf_bands,prt
         double precision,dimension(n),intent(in)::l,r,d,entrytime
         integer,dimension(n),intent(in)::idm,idd
         double precision,dimension(n,p01),intent(in)::x01
@@ -25,7 +25,8 @@
         integer,intent(in)::truncated,maxiter0
         integer,dimension(3),intent(in)::eps
 !  variables sortant
-        integer,intent(out)::converged,niter
+        integer,dimension(2),intent(out)::converged
+        integer,intent(out)::niter
 ! istop 
         double precision,dimension(p01+p02+p12),intent(out)::regpar
         double precision,dimension(99),intent(out)::t,a01,a01_l,a01_u,a02,a02_l,a02_u,a12,a12_l,a12_u
@@ -72,6 +73,7 @@
         pl=0
         loglik=0.d0       
         print_iter = prt
+	iconf = conf_bands
         no=N
         
         nva01=0 
@@ -177,8 +179,16 @@
         np = npw
         
         call marq98(b,np,niter,v1,res,ier,istop,ca,cb,dd,idmLikelihood)
-        if (istop.ne.1) goto 1000
-
+       
+        if (istop.ne.1)then
+        b(1) = 1.d0
+        b(2) = dsqrt(dble(som_idm)/ts)
+        b(3) = 1.d0
+        b(4) = dsqrt(dble(som_idd)/ts)  
+        b(5) = 1.d0     
+        b(6) = b(4)
+        endif
+        converged(1) = istop
         loglik(1) = res
 !            write(*,*)'niter1',niter,res
 
@@ -196,8 +206,9 @@
 
                 call marq98(b,np,niter,v1,res,ier,istop,ca,cb,dd,idmLikelihood)
                 loglik(2) = res
+                converged(2)=istop
                 if (istop.ne.1) goto 1000
-                
+
                 do i=npw+1,np
                         regpar(i-npw) = b(i)
                 end do        
@@ -288,6 +299,7 @@
                 end do
 
 !---------------- bootstrap ------------------------------
+		if (iconf.eq.1)then
                 x1 = 0.d0
                 x2 = 0.d0
                 do jj=1,2000
@@ -370,10 +382,17 @@
                         a12_u(k) = vect(1950)
                         a12_l(k) = vect(51)
                 end do  
-
+		else 
+			a01_l=0
+			a01_u=0
+			a02_l=0
+			a02_u=0
+			a12_l=0
+			a12_u=0
+		end if
 
 1000    continue
-        converged = istop
+        
         deallocate(t0,t1,t2,t3,ve01,ve02,ve12,c)
 
         end subroutine idmWeib

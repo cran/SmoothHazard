@@ -19,7 +19,7 @@
 !add prt,noVar
         subroutine survPl(entrytime,l,r,id,x,N,nva,truncated,interval,eps &
         ,maxiter0,loglik,regpar,v,converged,cv,niter,t,S,S_l,S_u,h,h_l,h_u,&
-        nknots,irec,kappa0,kappa,igraph,CVcrit,mdf,ti,theta,prt,hess_tot)
+        nknots,irec,kappa0,kappa,conf_bands,CVcrit,mdf,ti,theta,prt,hess_tot)
 !!! CT 26sept2012
 ! noVar    
 !!! fin CT 26sept2012
@@ -36,7 +36,7 @@
         double precision::min,max,estimvSurv,ca,cb,dd,res
         double precision::mdf_int
 !!      double precision,dimension(:),allocatable::b2
-        integer,intent(in)::igraph,N,nknots,irec
+        integer,intent(in)::conf_bands,N,nknots,irec
         integer,dimension(N)::id
         double precision,dimension(N)::entrytime,l,r
         double precision,intent(in)::kappa0
@@ -47,7 +47,8 @@
         double precision,dimension(nva),intent(out)::regpar
         double precision,dimension(nva*nva),intent(out)::v
         double precision,dimension(2),intent(out)::loglik       
-        integer,intent(out)::converged,niter
+        integer,dimension(2),intent(out)::converged
+        integer,intent(out)::niter
 ! istop
         double precision,dimension(99),intent(out)::t,S,S_l,S_u,h,h_l,h_u
         double precision,external::survPlLikelihood
@@ -71,6 +72,7 @@
         pl=1
         ind_hess=0
         print_iter = prt
+	iconf = conf_bands
 !end add
         npar = 0
         verSurv = 0
@@ -271,13 +273,17 @@
         CVcrit = crit/dble(no)
 
         allocate(v1(np*(np+3)/2))
-
-!       write(*,*)'avant marq98',np,k0Surv      
+     
         call marq98(b,np,niter,v1,res,ier,istop,ca,cb,dd,survPlLikelihood)
-!       write(*,*)'apres marq98',niter,res,istop
-        if (istop.ne.1) goto 1000
+        converged(1) = istop
+
+        if (istop.ne.1)then 
+           do i=1,np
+              b(i)=5.d-1
+           end do
+        endif
         loglik(1)=res
-!       write(*,*)'loglik',loglik(1)
+
 
         if(noVar .ne. 1)then
 !               write(*,*)' '
@@ -296,21 +302,17 @@
                 end do  
 
                 call marq98(b,npar,niter,v1,res,ier,istop,ca,cb,dd,survPlLikelihood)
-                if (istop.ne.1) goto 1000
-                
-!               write(*,*)'log-vrais',res,' nb iter ',niter
+                converged(2) = istop
                 loglik(2) = res
-                
-   
+                if (istop.ne.1) goto 1000
+               
+!               write(*,*)'log-vrais',res,' nb iter ',niter
 
                 do i=1,nva
                         ii = npar-nva+i
                         regpar(i)=b(ii)
                 end do 
 
-
-
-                
         
 !               write(*,*)' '
 !               write(*,*)nomfichregr,' fichier variables explicatives'
@@ -354,11 +356,11 @@
         cv(2) = cb
         cv(3) = dd
 
-        irep = igraph
+!        irep = igraph
 
-        if(irep.eq.1)then
+!        if(irep.eq.1)then
                 call distanceSurv(v1,b,t,S,S_l,S_u,h,h_l,h_u)
-        endif   
+!        endif   
         kappa=k0Surv
 
 1000    continue  
