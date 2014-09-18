@@ -1,6 +1,6 @@
 Package: SmoothHazard
 Title: Fitting illness-death model for interval-censored data
-Version: 1.2.0
+Version: 1.2.3
 Author: Celia Touraine, Pierre Joly, Thomas A. Gerds
 Description: SmoothHazard is a package for fitting illness-death (and survival)
     model with possibly interval-censored data for transition toward transient
@@ -16,7 +16,7 @@ Depends: R (>= 1.9.1)
 Imports: lava, mvtnorm, prodlim
 Maintainer: Thomas Alexander Gerds <tag@biostat.ku.dk>
 License: GPL (>= 2)
-Packaged: 2014-09-18 07:31:18 UTC; tag
+Packaged: 2014-09-18 18:35:39 UTC; tag
 NeedsCompilation: yes
 Repository: CRAN
-Date/Publication: 2014-09-18 09:45:25
+Date/Publication: 2014-09-19 00:58:57

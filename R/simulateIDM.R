@@ -23,6 +23,7 @@
 ##' @param punctuality Standard deviation of waiting time between
 ##' inspections.
 ##' @examples
+##' \dontrun{
 ##' library(lava)
 ##' library(prodlim)
 ##' # generate illness-death model based on exponentially
@@ -118,6 +119,7 @@
 ##'           data=d,conf.int=FALSE)
 ##' print(F3)
 ##' cbind(uncensored=F1$coef,right.censored=F2$coef,interval.censored=F3$coef)
+##' }
 ##' @return A latent variable model object \code{lvm}
 ##' @author Thomas Alexander Gerds
 ##' @export
