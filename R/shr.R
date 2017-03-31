@@ -20,19 +20,32 @@
 #' (criterion for parameters, criterion for likelihood, criterion for
 #' second derivatives). The default is 'c(5,5,3)' and corresponds to
 #' criteria equals to \eqn{10^{-5}}, \eqn{10^{-5}} and \eqn{10^{-3}}.
-#' @param nknots number of knots for the splines to use to approximate
-#' the hazard function. Argument for the penalized likelihood
-#' approach.  The default is 7.
+#' @param n.knots  Argument only active for the penalized likelihood approach \code{method="splines"}.
+#' Number of knots for the splines to use to approximate
+#' the hazard function. The default is 7. If \code{knots} are given as a vector this argument is ignored.
+#' The algorithm needs least 5 knots and at most 20 knots.
+#' @param knots Argument only active for the penalized likelihood approach \code{method="splines"}.
+#' There are three ways to control the placement of the knots between the smallest and the largest
+#' of all time points:
+#' \itemize{
+#'  \item{\code{knots="equidistant"}}{Knots are placed with same distance on the time scale.}
+#'  \item{\code{knots="quantiles"}}{Knots are placed such that the number of observations is roughly the same between knots.}
+#' \item{knots=list()}{List of length 3. The list elements are the actual placements
+#' (timepoints) of the knots for the M-spline.}
+#' }
+#' The algorithm needs at least 5 knots and allows no more than 20 knots.
 #' @param CV binary variable equals to 1 when search (by approximated
 #' cross validation) of the smoothing parameter kappa and 0
 #' otherwise. Argument for the penalized likelihood approach. The
 #' default is 0.
-#' @param kappa if CV=FALSE, smoothing parameter; if CV=TRUE, initial
-#' value of the smoothing parameters for the cross validation
-#' search. Argument for the penalized likelihood approach.
-#' @param conf.int Boolean parameter. Equals to \code{TRUE} to
-#' calculate pointwise confidence intervals for the survival or hazard
-#' curves, \code{FALSE} otherwise. Default is \code{TRUE}.
+#' @param kappa Argument only active for the penalized likelihood approach \code{method="splines"}.
+#' A positive number (smoothing parameter) 
+#' If CV=1 the value is used as a starting value 
+#' for a cross validation search to optimize \code{kappa}.
+#' @param conf.int Level of confidence pointwise confidence intervals of the survival and hazard functions, i.e.,
+#' a value between 0 and 1, the default is \code{0.95}.
+#' The default is also used when \code{conf.int=TRUE}.
+#' To avoid computation of confidence intervals, set \code{conf.int} to FALSE or NULL.
 #' @param maxiter maximum number of iterations. The default is 200.
 #' @param method type of estimation method: "Splines" for a penalized
 #' likelihood approach with approximation of the hazard function by
@@ -59,8 +72,8 @@
 #' \item{surv}{matched values of the survival function.} \item{lowerSurv}{lower
 #' confidence limits for survival function.} \item{upperSurv}{upper confidence
 #' limits for survival function.} \item{RR}{vector of relative risks.}
-#' \item{V}{variance-covariance matrix.} \item{se}{standart errors.}
-#' \item{knots}{knots to approximate by M-splines the hazard function.}
+#' \item{V}{variance-covariance matrix.} \item{se}{standard errors.}
+#' \item{knots}{knots of the M-splines estimate of the hazard function.}
 #' \item{nknots}{number of knots.} \item{CV}{a binary variable equals to 1 when
 #' search of the smoothing parameter \link{kappa} by approximated
 #' cross-validation, 1 otherwise. The default is 0.} \item{niter}{number of
@@ -74,57 +87,70 @@
 #' of nonlinear parameters.  \emph{SIAM Journal of Applied Mathematics},
 #' 431-441.
 #' @keywords methods 
-#' @examples
-#' 
-#' # Weibull survival model
-#' library(prodlim)
-#' data(testdata)
-#' fit.su <- shr(Hist(time=list(l,r),id)~cov,data=testdata,) 
-#' 
-#' ## to print
-#' fit.su
-#' 
-#' ## summary
-#' summary(fit.su)
-#' 
-#' @export shr
+##' @examples
+##' 
+##' # Weibull survival model
+##' library(prodlim)
+##' data(testdata)
+##' fit.su <- shr(Hist(time=list(l,r),id)~cov,data=testdata) 
+##' fit.su
+##' summary(fit.su)
+##'\dontrun{
+##' shr.spline <- shr(Hist(time=list(l,r),id)~cov,data=testdata,method="splines",n.knots=6)
+##' shr.spline
+##' shr.spline.q <- shr(Hist(time=list(l,r),id)~cov,data=testdata,
+##'                     method="splines",n.knots=6,knots="quantiles")
+##' plot(shr.spline.q)
+##'
+##' ## manual placement of knots
+##' shr.spline.man <- shr(Hist(time=list(l,r),id)~cov,data=testdata,method="splines",knots=seq(0,7,1))
+##' }
+#' @export
 shr <- function(formula,
-                 data,
-                 eps=c(5,5,3),
-                 nknots=7,
-                 CV=FALSE,
-                 kappa=10000,
-                 conf.int=TRUE,
-                 maxiter=200,
-                 method="Weib",
-                 print.iter=FALSE,
-                 na.action=na.omit){
+                data,
+                eps=c(5,5,3),
+                n.knots=7,
+                knots="equidistant",
+                CV=FALSE,
+                kappa=10000,
+                conf.int=.95,
+                maxiter=200,
+                method="Weib",
+                print.iter=FALSE,
+                na.action=na.omit){
 
   call <- match.call()
   ## cat("\n")
   ## cat("Be patient. The program is computing ... \n") 
 	
-  flush.console()
-  ptm<-proc.time()
-  # {{{ process formula and data
-  # check if formula is a formula 
-  if(!(method %in% c("Weib","Splines"))) stop("The method must be either 'Weib' or 'Splines'")
-  # --------------------------------------------------------------------
-  formula.names <- try(all.names(formula),silent=TRUE)
-  if (!(formula.names[1]=="~")||(match("$",formula.names,nomatch=0)+match("[",formula.names,nomatch=0)>0)){
-    stop("Invalid specification of formula. Perhaps forgotten right hand side?\nNote that any subsetting, ie data$var or data[,\"var\"], is invalid for this function.")
-  }else{
-    if (!(formula.names[2] %in% c("Surv","Hist"))) stop("formula is NOT a proper survival formula,\nwhich must have a `Surv' or `Hist' object as response.")
-  }
-	
-  call <- match.call()
-  m <- match.call()
-  position <- match(c("","formula","data","na.action"),names(m),0)
-  m <- m[position]
-  m[[1]] <- as.name("model.frame")	
-  m <- eval(m,sys.parent())
-  na.action <- attr(m,"na.action")
-  response <- model.response(m)
+    flush.console()
+    ptm<-proc.time()
+    # {{{ process formula and data
+    # check if formula is a formula
+    method <- tolower(method)
+    if(!(method %in% c("weib","splines"))) stop("The method must be either 'Weib' or 'Splines'")
+    # --------------------------------------------------------------------
+    formula.names <- try(all.names(formula),silent=TRUE)
+    if (!(formula.names[1]=="~")||(match("$",formula.names,nomatch=0)+match("[",formula.names,nomatch=0)>0)){
+        stop("Invalid specification of formula. Perhaps forgotten right hand side?\nNote that any subsetting, ie data$var or data[,\"var\"], is invalid for this function.")
+    }else{
+        if (!(formula.names[2] %in% c("Surv","Hist"))) stop("formula is NOT a proper survival formula,\nwhich must have a `Surv' or `Hist' object as response.")
+    }
+    # {{{ parse confidence level
+    do.conf.int <- !is.null(conf.int) && !is.na(conf.int) && !conf.int==FALSE
+    if (is.logical(conf.int)) conf.int <- .95
+    if (do.conf.int == TRUE){
+        stopifnot(0<conf.int && conf.int<1)
+    }
+    # }}}	
+    call <- match.call()
+    m <- match.call()
+    position <- match(c("","formula","data","na.action"),names(m),0)
+    m <- m[position]
+    m[[1]] <- as.name("model.frame")	
+    m <- eval(m,sys.parent())
+    na.action <- attr(m,"na.action")
+    response <- stats::model.response(m)
 
   #  FIX for people who use `Surv' instead of `Hist' 
   
@@ -190,130 +216,157 @@ shr <- function(formula,
   # }}}
   # {{{ call Fortran function weib and collect results
 
-  # do not give infinite values to fortran
-  Rtime[is.infinite(Rtime)] <- Ltime[is.infinite(Rtime)]
+    # do not give infinite values to fortran
+    Rtime[is.infinite(Rtime)] <- Ltime[is.infinite(Rtime)]
+    # find time bounderies
+    if (length(entrytime)>0){
+        alltimes <- sort(unique(c(Ltime, Rtime,entrytime)))
+        amax <- max(alltimes)
+        amin <- min(alltimes)
+    }
+    else{
+        alltimes <- sort(unique(c(Ltime, Rtime)))
+        amax <- max(alltimes)
+        amin <- min(alltimes)
+    }
 
-  if (method == "Weib"){	
-    size1 <- NC
-    size2 <- size1^2
-    size_V <- size1 + 2
-    ffit <- .Fortran("survWeib",
-                     as.double(entrytime),
-                     as.double(Ltime),
-                     as.double(Rtime),
-                     as.integer(id),
-                     as.double(X),
-                     as.integer(N),
-                     as.integer(NC),
-                     as.integer(truncated),
-                     as.integer(isIntervalCensored),
-                     as.integer(eps),
-                     as.integer(maxiter),
-                     loglik=as.double(rep(0,2)),
-                     basepar=as.double(rep(0.1,2)),
-                     regpar=as.double(rep(0.1,NC)),
-                     v=as.double(rep(0,NC*NC)),
-                     converged=as.integer(rep(0,2)),
-                     cv=as.double(rep(0,3)),
-                     niter=as.integer(0),
-                     t=as.double(rep(0,100)),
-                     S=as.double(rep(0,100)),
-                     S_l=as.double(rep(0,100)),
-                     S_u=as.double(rep(0,100)),
-                     h=as.double(rep(0,100)),
-                     h_l=as.double(rep(0,100)),
-                     h_u=as.double(rep(0,100)),
-		     as.integer(conf.int),
-                     as.integer(print.iter),
-                     V_tot=as.double(matrix(0,nrow=size_V,ncol=size_V)),
-                     PACKAGE="SmoothHazard")
+  if (method == "weib"){	
+      size1 <- NC
+      size2 <- size1^2
+      size_V <- size1 + 2
+      ffit <- .Fortran("survWeib",
+                       as.double(entrytime),
+                       as.double(Ltime),
+                       as.double(Rtime),
+                       as.integer(id),
+                       as.double(X),
+                       as.integer(N),
+                       as.integer(NC),
+                       as.integer(truncated),
+                       as.integer(isIntervalCensored),
+                       as.integer(eps),
+                       as.integer(maxiter),
+                       loglik=as.double(rep(0,2)),
+                       basepar=as.double(rep(0.1,2)),
+                       regpar=as.double(rep(0.1,NC)),
+                       v=as.double(rep(0,NC*NC)),
+                       converged=as.integer(rep(0,2)),
+                       cv=as.double(rep(0,3)),
+                       niter=as.integer(0),
+                       t=as.double(rep(0,100)),
+                       S=as.double(rep(0,100)),
+                       S_l=as.double(rep(0,100)),
+                       S_u=as.double(rep(0,100)),
+                       h=as.double(rep(0,100)),
+                       h_l=as.double(rep(0,100)),
+                       h_u=as.double(rep(0,100)),
+                       as.integer(do.conf.int),
+                       as.double(conf.int),
+                       as.integer(print.iter),
+                       V_tot=as.double(matrix(0,nrow=size_V,ncol=size_V)),
+                       PACKAGE="SmoothHazard")
   }else{
-    size1 <- NC
-    size2 <- size1^2
-    size_V <- size1 + nknots + 2
-    ffit <- .Fortran("survPl",
-                     as.double(entrytime),
-                     as.double(Ltime),
-                     as.double(Rtime),
-                     as.integer(id),
-                     as.double(X),
-                     as.integer(N),
-                     as.integer(NC),
-                     as.integer(truncated),
-                     as.integer(isIntervalCensored),
-                     as.integer(eps),
-                     as.integer(maxiter),
-                     loglik=as.double(rep(0,2)),
-                     regpar=as.double(rep(0.1,NC)),
-                     v=as.double(rep(0,NC*NC)),
-                     converged=as.integer(rep(0,2)),
-                     cv=as.double(rep(0,3)),
-                     niter=as.integer(0),
-                     t=as.double(rep(0,99)),
-                     S=as.double(rep(0,99)),
-                     S_l=as.double(rep(0,99)),
-                     S_u=as.double(rep(0,99)),
-                     h=as.double(rep(0,99)),
-                     h_l=as.double(rep(0,99)),
-                     h_u=as.double(rep(0,99)),
-                     as.integer(nknots),
-                     as.integer(CV),
-                     as.double(kappa),
-                     kappa=as.double(0),
-                     as.integer(conf.int),
-                     CVcrit=as.double(0),
-                     mdf=as.double(0),
-                     ti=as.double(rep(0,(nknots+6))),
-                     theta=as.double(rep(0,(nknots+2))),
-                     as.integer(print.iter),
-                     V_tot=as.double(matrix(0,nrow=size_V,ncol=size_V)),
-                     PACKAGE="SmoothHazard")
+       #  	cat("------ Program Splines ------ \n")
+       if (is.character(knots)){
+           if (length(n.knots)!=1) stop("Argument n.knots has to be a single positive integer")
+           if((!is.numeric(n.knots) && !is.integer(n.knots)) || (n.knots < 5) || (n.knots >20))
+               stop("n.knots has to be an integer between 5 and 20. See help(shr).")
+           if (knots=="quantiles"){
+               knots <- quantile(alltimes,seq(0,1,1/(n.knots-1)))
+           } else {
+                 if (knots!="equidistant")
+                     warning("Unknown specification of knots. Fall back to equidistant.")
+                 knots <- seq(amin,amax,(amax-amin)/(n.knots-1))
+             }
+       } else{## user specified knots
+             if (!is.numeric(knots))
+                 stop("Incorrect form of argument knots. See help(shr).")
+             if (knots[1]< amin - 0.05*amin) stop(paste("Smallest knot should not be smaller than the time point:",amin))
+             if (knots[length(knots)]> amax + 0.05*amax) stop(paste("Largest knot should not be larger than the time point:",amax))
+             knots <- sort(knots)
+         }
+       nknots <- length(knots)
+       if (nknots<5) {
+           stop("Need at least 5 knots.")
+       }
+       if (nknots>20){
+           stop("Cannot handle more than 20 knots.")
+       }
+       ## make fake knots needed for M-splines
+       knots <- c(rep(knots[1],3),knots,rep(knots[length(knots)],3))
+       size1 <- NC
+       size2 <- size1^2
+       size_V <- size1 + nknots + 2
+       ffit <- .Fortran("survPl",
+                        as.double(entrytime),
+                        as.double(Ltime),
+                        as.double(Rtime),
+                        as.integer(id),
+                        as.double(X),
+                        as.integer(N),
+                        as.integer(NC),
+                        as.integer(truncated),
+                        as.integer(isIntervalCensored),
+                        as.integer(eps),
+                        as.integer(maxiter),
+                        loglik=as.double(rep(0,2)),
+                        regpar=as.double(rep(0.1,NC)),
+                        v=as.double(rep(0,NC*NC)),
+                        converged=as.integer(rep(0,2)),
+                        cv=as.double(rep(0,3)),
+                        niter=as.integer(0),
+                        t=as.double(rep(0,99)),
+                        S=as.double(rep(0,99)),
+                        S_l=as.double(rep(0,99)),
+                        S_u=as.double(rep(0,99)),
+                        h=as.double(rep(0,99)),
+                        h_l=as.double(rep(0,99)),
+                        h_u=as.double(rep(0,99)),
+                        as.integer(nknots),
+                        as.double(knots),
+                        as.integer(CV),
+                        as.double(kappa),
+                        kappa=as.double(0),
+                        as.integer(do.conf.int),
+                        as.double(conf.int),
+                        CVcrit=as.double(0),
+                        mdf=as.double(0),
+                        ti=as.double(rep(0,(nknots+6))),
+                        theta=as.double(rep(0,(nknots+2))),
+                        as.integer(print.iter),
+                        V_tot=as.double(matrix(0,nrow=size_V,ncol=size_V)),
+                        PACKAGE="SmoothHazard")
 
 
 
   }
-  ## Fortran delivers
-  ## Variable name 	Explanation 	Dimension 	Storage mode 	Remark
-  ## loglik 	log-likelihood without and with covariate 	length 2 	double 	
-  ## basepar 	Weibull parameters 	length 2 	double 	
-  ## regpar 	Regression coefficients 	length P 	double 	
-  ## v 	covariance matrix 	length P*P 	double 	
-  ## converged 	0=converged,1=invert fails,2=no 	length 1 	integer 	
-  ## t 	time to plot S(t) and h(t) 	length 100 	double 	
-  ## S 	survival function 	length 100 	double 	
-  ## S_l 	lower confidence limit for S 	length 100 	double 	
-  ## S_u 	Upper confidence limit for S 	length 100 	double 	
-  ## h 	hazard function 	length 100 	double 	
-  ## h_l 	lower confidence limit for h function 	length 100 	double 	
-  ## h_u 	upper confidence limit for h 	length 100 	double 	
-  
-  if (ffit$converged[1] == 4){
-    warning("Problem in the loglikelihood computation. The program stopped abnormally. Please verify your dataset. \n")    
+    ## Fortran delivers
+    ## Variable name 	Explanation 	Dimension 	Storage mode 	Remark
+    ## loglik 	log-likelihood without and with covariate 	length 2 	double 	
+    ## basepar 	Weibull parameters 	length 2 	double 	
+    ## regpar 	Regression coefficients 	length P 	double 	
+    ## v 	covariance matrix 	length P*P 	double 	
+    ## converged 	0=converged,1=invert fails,2=no 	length 1 	integer 	
+    ## t 	time to plot S(t) and h(t) 	length 100 	double 	
+    ## S 	survival function 	length 100 	double 	
+    ## S_l 	lower confidence limit for S 	length 100 	double 	
+    ## S_u 	Upper confidence limit for S 	length 100 	double 	
+    ## h 	hazard function 	length 100 	double 	
+    ## h_l 	lower confidence limit for h function 	length 100 	double 	
+    ## h_u 	upper confidence limit for h 	length 100 	double 	
+  if (any(ffit$converged[1] == 4)){
+      warning("Problem in the loglikelihood computation. The program stopped abnormally. Please check your dataset. \n")    
   }
-	
-  if (ffit$converged[1] == 2){
-    warning("Model did not converge. Change the 'maxit' parameter")
+  if (any(ffit$converged[1] == 2)){
+      if (CV==0) 
+          warning("Model did not converge. You could try to increase the 'maxit' parameter and set 'CV=1'.")
+      else
+          warning("Model did not converge. You could try to increase the 'maxit' parameter and modify the start values for 'kappa'.")
   }
-
-  if (ffit$converged[1] == 3){
-    warning("Fisher information matrix non-positive definite.")
+  if (any(ffit$converged == 3)){
+      warning("The Fisher information matrix is not positive definite.")
   }
-  if (ffit$converged[2] != 0){
-     if (ffit$converged[2] == 4){
-      warning("With covariates, problem in the loglikelihood computation. The program stopped abnormally. Please verify your dataset. \n")    
-    }
-
-    if (ffit$converged[2] == 2){
-      warning("With covariates, model did not converge. You could change the 'maxit' parameter")
-    }
-
-    if (ffit$converged[2] == 3){
-      warning("With covariates, Fisher information matrix non-positive definite.")
-    }
-  }
-  
-  if(method=="Weib") weibullParameter <- ffit$basepar
-
+  if(method=="weib") weibullParameter <- ffit$basepar
   # }}}
   # {{{ output 
 	
@@ -322,7 +375,7 @@ shr <- function(formula,
 	
 
   fit$loglik <- ffit$loglik
-  if(method=="Weib"){
+  if(method=="weib"){
     fit$modelPar <- weibullParameter
   }
   fit$N <- N
@@ -349,7 +402,7 @@ shr <- function(formula,
     fit$V_cov <- V
   }
   V <- matrix(ffit$V_tot,nrow=size_V,ncol=size_V,byrow=T)
-  if(method=="Weib"){
+  if(method=="weib"){
     colnames(V) <- c("sqrt(a)","sqrt(b)",Xnames)
     rownames(V) <- c("sqrt(a)","sqrt(b)",Xnames)
   }else{
@@ -362,7 +415,7 @@ shr <- function(formula,
   fit$niter <- ffit$niter
   fit$cv <- ffit$cv
 
-  if(method=="Splines"){
+  if(method=="splines"){
     fit$nknots <- nknots
     fit$knots <- ffit$ti
     fit$theta <-  ffit$theta
@@ -376,11 +429,13 @@ shr <- function(formula,
       fit$kappa <- kappa
     }
 
-}
-  fit$na.action <- na.action
-  # }}}
-  fit$method <- method
-  class(fit) <- "shr"
-  fit$runtime <- proc.time()-ptm
-  fit
+  }
+    fit$na.action <- na.action
+    # }}}
+    if (method=="weib") fit$method <- "Weib" else fit$method <- "Splines"
+    fit$maxtime <- amax
+    fit$mintime <- amin
+    class(fit) <- "shr"
+    fit$runtime <- proc.time()-ptm
+    fit
 }

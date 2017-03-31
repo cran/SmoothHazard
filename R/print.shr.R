@@ -6,7 +6,7 @@
 #' 
 #' @param x a \code{shr} object, i.e., the result of a call to the
 #' \code{\link{shr}} function with \code{hazard}="Splines".
-#' @param conf.int confiance level.
+#' @param conf.int The level of confidence for the hazard ratios. The default is \code{0.95}.
 #' @param digits number of digits to print.
 #' @param pvalDigits number of digits to print for p-values.
 #' @param eps convergence criterion used for p-values.
@@ -24,15 +24,16 @@
 #' fit.su <- shr(Hist(time=list(l,r),id)~cov,data=testdata,method="Splines") 
 #' print(fit.su) 
 #' }
-#' @S3method print shr
+#' @export
 print.shr <- function(x,conf.int=.95,digits=4,pvalDigits=4,eps=0.0001,...){
     if (!inherits(x,"shr")) stop("Object must be of class 'shr'")
     cl <- x$call
     cat("Call:\n")
     dput(cl)
     cat("\n")
-    if (x$converged == 1){
-        if(x$NC >0){
+  
+    if (x$converged[1] == 1){
+        if((x$NC >0)&&(x$converged[2]==1)){
             wald <- (x$coef/x$se)**2
             z <- abs(qnorm((1 + conf.int)/2))
             tmp <- data.frame("coef"=format(round(x$coef,digits)),
@@ -75,7 +76,7 @@ print.shr <- function(x,conf.int=.95,digits=4,pvalDigits=4,eps=0.0001,...){
         cat("                    : likelihood=", signif(x$cv[2],2), "\n") 
         cat("                    : second derivatives=", signif(x$cv[3],2), "\n")
     }else{
-        switch(as.character(x$converged),
+        switch(as.character(x$converged[1]),
                "2"={ warning("Maximum number of iterations reached.",call.=FALSE)},
                "3"={ warning("Model did not converge.",call.=FALSE)})
     }
