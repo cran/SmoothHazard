@@ -1,0 +1,24 @@
+bibentry(bibtype = "Article",
+  title        = "{SmoothHazard}: An {R} Package for Fitting Regression Models to Interval-Censored Observations of Illness-Death Models",
+  author       = c(person(given = "C\\'elia",
+                          family = "Touraine",
+                          email = "celia.touraine@inserm.fr"),
+                   person(given = c("Thomas", "A."),
+                          family = "Gerds"),
+                   person(given = "Pierre",
+                          family = "Joly")),
+  journal      = "Journal of Statistical Software",
+  year         = "2017",
+  volume       = "79",
+  number       = "7",
+  pages        = "1--22",
+  doi          = "10.18637/jss.v079.i07",
+
+  header       = "To cite SmoothHazard in publications use:",
+  textVersion  =
+  paste("Celia Touraine, Thomas A. Gerds, Pierre Joly (2017).",
+        "SmoothHazard: An R Package for Fitting Regression Models to Interval-Censored Observations of Illness-Death Models.",
+        "Journal of Statistical Software, 79(7), 1-22.",
+        "doi:10.18637/jss.v079.i07")
+)
+
