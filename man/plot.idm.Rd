@@ -4,9 +4,23 @@
 \alias{plot.idm}
 \title{Plot method for an illness-death model}
 \usage{
-\method{plot}{idm}(x, conf.int = FALSE, citype = "shadow", add = FALSE,
-  axes = TRUE, col, lwd, lty, xlim, ylim, xlab, ylab, legend = TRUE,
-  transition = c("01", "02", "12"), ...)
+\method{plot}{idm}(
+  x,
+  conf.int = FALSE,
+  citype = "shadow",
+  add = FALSE,
+  axes = TRUE,
+  col,
+  lwd,
+  lty,
+  xlim,
+  ylim,
+  xlab,
+  ylab,
+  legend = TRUE,
+  transition = c("01", "02", "12"),
+  ...
+)
 }
 \arguments{
 \item{x}{a \code{idmWeib} class object (output from calling

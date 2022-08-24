@@ -5,8 +5,18 @@
 \title{Predictions for an illness-death model using either a penalized likelihood
 approach or a Weibull parametrization.}
 \usage{
-\method{predict}{idm}(object, s, t, newdata, nsim = 200, seed = 21,
-  conf.int = 0.95, lifeExpect = FALSE, maxtime, ...)
+\method{predict}{idm}(
+  object,
+  s,
+  t,
+  newdata,
+  nsim = 200,
+  seed = 21,
+  conf.int = 0.95,
+  lifeExpect = FALSE,
+  maxtime,
+  ...
+)
 }
 \arguments{
 \item{object}{an \code{idm} class objects returned by a call to the

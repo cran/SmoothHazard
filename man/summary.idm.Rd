@@ -4,8 +4,7 @@
 \alias{summary.idm}
 \title{Summary of a fitted illness-death model}
 \usage{
-\method{summary}{idm}(object, conf.int = 0.95, digits = 4, pvalDigits = 4,
-  eps = 0.0001, ...)
+\method{summary}{idm}(object, conf.int = 0.95, digits = 4, pvalDigits = 4, eps = 0.0001, ...)
 }
 \arguments{
 \item{object}{a \code{idmSplines} object, i.e., the result of a call to the

@@ -4,8 +4,7 @@
 \alias{print.shr}
 \title{Print method for \code{shrSplines} objects}
 \usage{
-\method{print}{shr}(x, conf.int = 0.95, digits = 4, pvalDigits = 4,
-  eps = 0.0001, ...)
+\method{print}{shr}(x, conf.int = 0.95, digits = 4, pvalDigits = 4, eps = 0.0001, ...)
 }
 \arguments{
 \item{x}{a \code{shr} object, i.e., the result of a call to the

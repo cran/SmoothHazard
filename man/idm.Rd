@@ -4,10 +4,23 @@
 \alias{idm}
 \title{Fit an illness-death model}
 \usage{
-idm(formula01, formula02, formula12, data, maxiter = 200, eps = c(5, 5, 3),
-  n.knots = c(7, 7, 7), knots = "equidistant", CV = FALSE,
-  kappa = c(1000000, 500000, 20000), method = "Weib", conf.int = 0.95,
-  print.iter = FALSE, subset = NULL, na.action = na.fail)
+idm(
+  formula01,
+  formula02,
+  formula12,
+  data,
+  maxiter = 200,
+  eps = c(5, 5, 3),
+  n.knots = c(7, 7, 7),
+  knots = "equidistant",
+  CV = FALSE,
+  kappa = c(1000000, 500000, 20000),
+  method = "Weib",
+  conf.int = 0.95,
+  print.iter = FALSE,
+  subset = NULL,
+  na.action = na.fail
+)
 }
 \arguments{
 \item{formula01}{A formula specifying a regression model for the

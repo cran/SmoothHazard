@@ -101,9 +101,10 @@ predict.idm <- function(object,s,t,newdata,nsim=200,seed=21,conf.int=.95,lifeExp
     nvar02 <- object$NC[2]
     nvar12 <- object$NC[3]
     if (!missing(newdata)){
-        if (NROW(newdata)>1) stop("Argument newdata has more than one row\n.Currently this function works only for one covariate constallation at a time.")
+        # if (NROW(newdata)>1) stop("Argument newdata has more than one row\n.Currently this function works only for one covariate constallation at a time.")
         if (length(object$Xnames01)>0)
-            Z01 <- as.matrix(model.frame(formula=update.formula(formula(object$terms$Formula01),NULL~.),data=newdata))
+            Z01 <- as.matrix(model.frame(formula=update.formula(formula(object$terms$Formula01),NULL~.),
+                                         data=newdata))
         else 
             Z01 <- 0
         if (length(object$Xnames02)>0)

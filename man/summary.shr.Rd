@@ -4,8 +4,7 @@
 \alias{summary.shr}
 \title{Summary of a fitted survival model using a penalized likelihood approach}
 \usage{
-\method{summary}{shr}(object, conf.int = 0.95, digits = 4, pvalDigits = 4,
-  eps = 0.0001, ...)
+\method{summary}{shr}(object, conf.int = 0.95, digits = 4, pvalDigits = 4, eps = 0.0001, ...)
 }
 \arguments{
 \item{object}{a \code{shr} object, i.e., the result of a call to the

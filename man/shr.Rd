@@ -4,23 +4,34 @@
 \alias{shr}
 \title{Fit a survival model}
 \usage{
-shr(formula, data, eps = c(5, 5, 3), n.knots = 7, knots = "equidistant",
-  CV = FALSE, kappa = 10000, conf.int = 0.95, maxiter = 200,
-  method = "Weib", print.iter = FALSE, na.action = na.omit)
+shr(
+  formula,
+  data,
+  eps = c(5, 5, 3),
+  n.knots = 7,
+  knots = "equidistant",
+  CV = FALSE,
+  kappa = 10000,
+  conf.int = 0.95,
+  maxiter = 200,
+  method = "Weib",
+  print.iter = FALSE,
+  na.action = na.omit
+)
 }
 \arguments{
-\item{formula}{a formula object with the response on the left of a
-\eqn{\texttildelow} operator, and the terms on the right. The
+\item{formula}{a formula object with the response on the left hand side
+and the terms on the right hand side. The
 response must be a survival object or Hist object as returned by
-the 'Surv' or 'Hist' function.}
+the \code{'Surv'} or \code{'Hist'} function.}
 
 \item{data}{a data frame in which to interpret the variables named
 in the \code{formula}.}
 
 \item{eps}{a vector of length 3 for the convergence criteria
 (criterion for parameters, criterion for likelihood, criterion for
-second derivatives). The default is 'c(5,5,3)' and corresponds to
-criteria equals to \eqn{10^{-5}}, \eqn{10^{-5}} and \eqn{10^{-3}}.}
+second derivatives). The default is \code{c(5,5,3)} and corresponds to
+criteria equals to \code{10^{-5}}, \code{10^{-5}} and \code{10^{-3}}.}
 
 \item{n.knots}{Argument only active for the penalized likelihood approach \code{method="splines"}.
 Number of knots for the splines to use to approximate
@@ -36,7 +47,7 @@ of all time points:
 \item{knots=list()}{List of length 3. The list elements are the actual placements
 (timepoints) of the knots for the M-spline.}
 }
-The algorithm needs at least 5 knots and allows no more than 20 knots.}
+The algorithm reuqires at least 5 knots and allows no more than 20 knots.}
 
 \item{CV}{binary variable equals to 1 when search (by approximated
 cross validation) of the smoothing parameter kappa and 0
@@ -58,7 +69,7 @@ To avoid computation of confidence intervals, set \code{conf.int} to FALSE or NU
 \item{method}{type of estimation method: "Splines" for a penalized
 likelihood approach with approximation of the hazard function by
 M-splines, "Weib" for a parametric approach with a Weibull
-distribution on the hazard function. Default is "Weib".}
+distribution on the hazard function. Default is \code{"Weib"}.}
 
 \item{print.iter}{boolean parameter. Equals to \code{TRUE} to print
 the likelihood during the iteration process, \code{FALSE}
@@ -71,26 +82,33 @@ and third 'na.fail' if that is unset. The 'factory-fresh' default
 is na.omit. Another possible value is NULL.}
 }
 \value{
+\itemize{
 \item{call}{} \item{coef}{regression parameters.}
-\item{loglik}{vector containing the log-likelihood without and with
-covariate.} \item{modelPar}{Weibull parameters.} \item{N}{number of
-subjects.} \item{NC}{number of covariates.} \item{nevents}{number of
-events.} \item{modelResponse}{model response: \code{Hist} or \code{Surv}
-object.} \item{converged}{integer equal to 1 when the model converged, 2, 3
-or 4 otherwise.} \item{time}{times for which survival and hazard functions
-have been evaluated for plotting.} \item{hazard}{matched values of the
-hazard function.} \item{lowerHazard}{lower confidence limits for hazard
-function.} \item{upperHazard}{upper confidence limits for hazard function.}
-\item{surv}{matched values of the survival function.} \item{lowerSurv}{lower
-confidence limits for survival function.} \item{upperSurv}{upper confidence
-limits for survival function.} \item{RR}{vector of relative risks.}
-\item{V}{variance-covariance matrix.} \item{se}{standard errors.}
+\item{loglik}{vector containing the log-likelihood without and with covariate.}
+\item{modelPar}{Weibull parameters.}
+\item{N}{number of subjects.}
+\item{NC}{number of covariates.}
+\item{nevents}{number of events.}
+\item{modelResponse}{model response: \code{Hist} or \code{Surv} object.}
+\item{converged}{integer equal to 1 when the model converged, 2, 3 or 4 otherwise.}
+\item{time}{times for which survival and hazard functions have been evaluated for plotting.}
+\item{hazard}{matched values of the hazard function.}
+\item{lowerHazard}{lower confidence limits for hazard function.}
+\item{upperHazard}{upper confidence limits for hazard function.}
+\item{surv}{matched values of the survival function.}
+\item{lowerSurv}{lower confidence limits for survival function.}
+\item{upperSurv}{upper confidence limits for survival function.}
+\item{RR}{vector of relative risks.}
+\item{V}{variance-covariance matrix.}
+\item{se}{standard errors.}
 \item{knots}{knots of the M-splines estimate of the hazard function.}
-\item{nknots}{number of knots.} \item{CV}{a binary variable equals to 1 when
-search of the smoothing parameter \link{kappa} by approximated
-cross-validation, 1 otherwise. The default is 0.} \item{niter}{number of
-iterations.} \item{cv}{vector containing the convergence criteria.}
+\item{nknots}{number of knots.}
+\item{CV}{a binary variable equals to 1 when search of the smoothing parameter
+         \link{kappa} by approximated cross-validation, 1 otherwise. The default is 0.}
+\item{niter}{number of iterations.}
+\item{cv}{vector containing the convergence criteria.}
 \item{na.action}{observations deleted if missing values.}
+}
 }
 \description{
 Fit a survival model using either a semi-parametric approach (penalized
@@ -133,7 +151,7 @@ of nonlinear parameters.  \emph{SIAM Journal of Applied Mathematics},
 \code{\link{summary.shr}}, \code{\link{print.shr}},
 }
 \author{
-R: Celia Touraine <Celia.Touraine@isped.u-bordeaux2.fr> Fortran:
-Pierre Joly <Pierre.Joly@isped.u-bordeaux2.fr>
+R: Celia Touraine \email{celia.touraine@icm.unicancer.fr} Fortran:
+Pierre Joly \email{Pierre.Joly@isped.u-bordeaux2.fr}
 }
 \keyword{methods}
