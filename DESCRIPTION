@@ -1,7 +1,7 @@
 Package: SmoothHazard
 Title: Estimation of Smooth Hazard Models for Interval-Censored Data
         with Applications to Survival and Illness-Death Models
-Version: 2022.08.23
+Version: 2023.06.27
 Author: Celia Touraine, Pierre Joly, Thomas A. Gerds
 Description: Estimation of two-state (survival) models and irreversible illness-
     death models with possibly interval-censored,left-truncated and right-censored
@@ -17,8 +17,8 @@ Depends: R (>= 1.9.1), prodlim (>= 1.4.9)
 Imports: lava (>= 1.4.1), mvtnorm (>= 1.0-3)
 Maintainer: Thomas Alexander Gerds <tag@biostat.ku.dk>
 License: GPL (>= 2)
-Packaged: 2022-08-24 06:16:44 UTC; tag
-RoxygenNote: 7.2.0
+Packaged: 2023-06-27 07:41:11 UTC; tag
+RoxygenNote: 7.2.3
 NeedsCompilation: yes
 Repository: CRAN
-Date/Publication: 2022-08-24 07:00:19 UTC
+Date/Publication: 2023-06-27 14:10:02 UTC

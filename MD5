@@ -1,4 +1,4 @@
-aa14b8ce19096140a0ee14f0b716b937 *DESCRIPTION
+9de7775dec568cc6a523aab4fa66e486 *DESCRIPTION
 fefec47a20a8dc0223f06df0f03ae16b *NAMESPACE
 ebbb6aeaf5c27f1d2d4d07145f1f99d7 *R/SmoothHazard-package.R
 ea1fd3999b40d1df9aa0e2fa78775972 *R/idm.R
@@ -59,4 +59,3 @@ a2717148c74afa3f2a52f5d2c6523721 *src/survPlLikelihood.f90
 ce806bc9ab8781f0d8d26ad172df1299 *src/survWeib.f90
 085240d4b3abf966b9e7bf22fa0b397f *src/tri.f90
 e093041238cb309b72bdfd494be8e6a1 *src/useSurv.f90
-111784547288a3b09524e0070380c42a *tests/testthat/test-idm.R
