@@ -54,6 +54,9 @@
         integer::som_idd,som_idm
         double precision::ts
         integer,dimension(3)::noVar
+        
+        !! call GetRNGstate
+        call getrand()
 !---------------------------------      
 
         if(P01.gt.0)then
@@ -308,7 +311,7 @@
                 do jj=1,2000
         
                         do i=1,np
-                                call BGOS(1.d0,0,x1,x2,0.d0)
+                                call bgos(1.d0,0,x1,x2,0.d0)
                                 xi(i)=x1
                         end do   
         
@@ -397,6 +400,9 @@
 1000    continue
         
         deallocate(t0,t1,t2,t3,ve01,ve02,ve12,c)
+
+        !! call PutRNGstate
+        call putrand()
 
         end subroutine idmWeib
 

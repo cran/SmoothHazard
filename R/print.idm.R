@@ -13,12 +13,12 @@
 #' @author Celia Touraine <Celia.Touraine@@isped.u-bordeaux2.fr>, Thomas A. Gerds <tag@@biostat.ku.dk> 
 #' @seealso \code{\link{summary.idm}}, \code{\link{plot.idm}}
 #' @keywords methods
+#' @return No return value.
 #' @examples
-#' 
-#' \dontrun{
+#' \donttest{
 #' data(Paq1000)
 #' library(prodlim)
-#' fit.splines <-  idm(formula02=Hist(time=t,event=death,entry=t0)~certif,
+#' fit.splines <-  idm(formula02=Hist(time=t,event=death,entry=e)~certif,
 #' 		formula01=Hist(time=list(l,r),event=dementia)~certif,
 #'                 formula12=~1,
 #'                 method="Splines",
@@ -116,11 +116,11 @@ print.idm <- function(x,conf.int=.95,digits=4,pvalDigits=4,eps=0.0001,...){
                               "SE coef"=format(round(x$se,digits)),
                               "exp(coef)"=format(round(x$HR,digits)),
                               "CI"=paste("[",
-                                  format(round(exp(x$coef - z * x$se),2)),
-                                  ";",
-                                  format(round(exp(x$coef + z * x$se),2)),
-                                  "]",
-                                  sep=""),
+                                         format(round(exp(x$coef - z * x$se),2)),
+                                         ";",
+                                         format(round(exp(x$coef + z * x$se),2)),
+                                         "]",
+                                         sep=""),
                               ## "Wald"=format(wald,digits),
                               "p-value"=format.pval(1 - pchisq(wald, 1),digits=pvalDigits,eps=eps),
                               check.names=FALSE)
@@ -129,5 +129,6 @@ print.idm <- function(x,conf.int=.95,digits=4,pvalDigits=4,eps=0.0001,...){
         cat("\n\nRegression coefficients:\n\n")
         print(coeflist)
     }
+    return(NULL)
 }
 

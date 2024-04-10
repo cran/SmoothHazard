@@ -17,7 +17,7 @@
 ##' @param punctuality Standard deviation of waiting time between
 ##' inspections.
 ##' @examples
-##' \dontrun{
+##' \donttest{
 ##' library(lava)
 ##' library(prodlim)
 ##' # generate survival model based on exponentially

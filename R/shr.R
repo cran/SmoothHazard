@@ -27,7 +27,7 @@
 #' @param knots Argument only active for the penalized likelihood approach \code{method="splines"}.
 #' There are three ways to control the placement of the knots between the smallest and the largest
 #' of all time points:
-#' \itemize{
+#' \describe{
 #'  \item{\code{knots="equidistant"}}{Knots are placed with same distance on the time scale.}
 #'  \item{\code{knots="quantiles"}}{Knots are placed such that the number of observations is roughly the same between knots.}
 #' \item{knots=list()}{List of length 3. The list elements are the actual placements
@@ -60,7 +60,7 @@
 #' and third 'na.fail' if that is unset. The 'factory-fresh' default
 #' is na.omit. Another possible value is NULL.
 #' @return
-#' \itemize{
+#' \describe{
 #' \item{call}{} \item{coef}{regression parameters.}
 #' \item{loglik}{vector containing the log-likelihood without and with covariate.}
 #' \item{modelPar}{Weibull parameters.}
@@ -103,7 +103,7 @@
 ##' fit.su <- shr(Hist(time=list(l,r),id)~cov,data=testdata) 
 ##' fit.su
 ##' summary(fit.su)
-##'\dontrun{
+##'\donttest{
 ##' shr.spline <- shr(Hist(time=list(l,r),id)~cov,data=testdata,method="splines",n.knots=6)
 ##' shr.spline
 ##' shr.spline.q <- shr(Hist(time=list(l,r),id)~cov,data=testdata,
@@ -162,7 +162,7 @@ shr <- function(formula,
 
   #  FIX for people who use `Surv' instead of `Hist' 
   
-  if (match("Shr",class(response),nomatch=0)!=0){
+  if (inherits(response,"Shr")){
     # classe "Shr"
     attr(response,"model") <- "survival"
     attr(response,"cens.type") <- "rightCensored"

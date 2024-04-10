@@ -23,7 +23,7 @@
 ##' @param punctuality Standard deviation of waiting time between
 ##' inspections.
 ##' @examples
-##' \dontrun{
+##' \donttest{
 ##' library(lava)
 ##' library(prodlim)
 ##' # generate illness-death model based on exponentially
@@ -303,6 +303,7 @@ sim.idmModel <- function(x,
 ##' See the body of the function for details, i.e., evaluate simulateIDM
 ##' @seealso idmModel sim.idmModel
 ##' @title Sample illness-death model data
+##' @return Object with class \code{data.frame} which contains the simulated data.
 ##' @examples
 ##' # simulateIDM
 ##' simulateIDM(100)

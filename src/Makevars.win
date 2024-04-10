@@ -2,7 +2,7 @@ PKG_LIBS = $(BLAS_LIBS) $(FLIBS)
 
 FMODSRC = commun.f90 optim.f90 recKappa.f90 
 FSRC = bgos.f90 cdfnor.f90 distance.f90 estimv.f90 fonct.f90 idmLikelihood.f90 idmPl.f90 idmPlLikelihood.f90 idmPlLikelihood2.f90 idmPlLikelihood0.f90 idmWeib.f90 qgauss1.f90 survLikelihood.f90 survPl.f90 survPlLikelihood.f90 survWeib.f90 tri.f90 useSurv.f90
-CSRC= init.c
+CSRC= init.c runiran.c
 
 # Define the order of compilation
 OBJECTS = $(FMODSRC:.f90=.o) $(FSRC:.f90=.o) $(CSRC:.c=.o)
@@ -18,11 +18,11 @@ idmPl.o: commun.o optim.o recKappa.o
 idmPlLikelihood.o: commun.o
 idmPlLikelihood2.o: commun.o
 idmPlLikelihood0.o: commun.o
-idmWeib.o: commun.o optim.o idmLikelihood.o 
+idmWeib.o: commun.o optim.o idmLikelihood.o runiran.o
 survPl.o: commun.o optim.o idmPl.o
 survPlLikelihood.o: commun.o
 survPl.o: commun.o optim.o
 survPlLikelihood.o: commun.o
-survWeib.o: commun.o optim.o survLikelihood.o 
+survWeib.o: commun.o optim.o survLikelihood.o runiran.o
 useSurv.o: commun.o
 

@@ -49,6 +49,9 @@
         double precision::som,ts
         double precision,dimension(p+2,p+2),intent(out)::hess_tot
 
+        !! call GetRNGstate
+        call getrand()
+
         if(p.gt.0)then
         noVar=0
         else
@@ -443,6 +446,9 @@
 1000    continue
 !        converged = istop
         deallocate(t0,t1,t2,ve,c)
+        
+        !! call PutRNGstate
+        call putrand()
 
         end subroutine survWeib
 

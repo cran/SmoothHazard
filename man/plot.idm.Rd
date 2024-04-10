@@ -75,7 +75,7 @@ fit.weib <- idm(formula02=Hist(observed.lifetime,event=seen.exit)~1,
 formula01=Hist(time=list(L,R),event=seen.ill)~1,data=d,conf.int=FALSE)
 plot(fit.weib)
 
-\dontrun{
+\donttest{
 ## FIXME: the limits for the 01 transition are a bit wide!?
 ## with bootstrap confidence limits
 fit.weib <- idm(formula02=Hist(observed.lifetime,event=seen.exit)~1,

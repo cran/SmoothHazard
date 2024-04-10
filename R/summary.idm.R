@@ -15,9 +15,10 @@
 #' @seealso \code{\link{idm}}, \code{\link{print.idm}},
 #' \code{\link{plot.idm}} 
 #' @keywords methods
+#' @return No return value.
 #' @examples
 #' 
-#' \dontrun{
+#' \donttest{
 #' library(prodlim)
 #' data(Paq1000)
 #' fit.splines <-  idm(formula02=Hist(time=t,event=death,entry=e)~certif,
@@ -53,7 +54,8 @@ summary.idm <- function(object,conf.int=.95,digits=4,pvalDigits=4,eps=.0001, ...
             if(object$NC[2]>0) Xnames <- c(Xnames,paste(object$Xnames02,"_02",sep=""))
             if(object$NC[3]>0) Xnames <- c(Xnames,paste(object$Xnames12,"_12",sep=""))
             rownames(out) <- Xnames
-            print(out,row.names=T)
+            print(out,row.names=TRUE)
         }
     }
+    return(NULL)
 }

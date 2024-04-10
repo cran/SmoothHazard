@@ -20,13 +20,16 @@
 
 \item{\dots}{other unusued arguments.}
 }
+\value{
+No return value.
+}
 \description{
 Print a short summary of a fitted illness-death model using the penalized
 likelihood approach.
 }
 \examples{
 
-\dontrun{
+\donttest{
 # a penalized survival model 
 data(testdata)
 library(prodlim)

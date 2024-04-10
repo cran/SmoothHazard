@@ -41,7 +41,7 @@ The function \code{\link{sim.survIC}} then simulates
 interval censored times.
 }
 \examples{
-\dontrun{
+\donttest{
 library(lava)
 library(prodlim)
 # generate survival model based on exponentially

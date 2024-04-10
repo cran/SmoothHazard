@@ -1,0 +1,3 @@
+The fortran code in cdfnor.f90 is from Cody, W.D. (1993). "ALGORITHM 715: SPECFUN - A Portabel FORTRAN
+Package of Special Function Routines and Test Drivers" acm Transactions on Mathematical Software. 19, 22-32.
+It contains modifications by Alfred H. Morris and Barry W. Brown.

@@ -58,7 +58,7 @@ The function \code{\link{sim.idmModel}} then simulates
 right censored lifetimes and interval censored illness times.
 }
 \examples{
-\dontrun{
+\donttest{
 library(lava)
 library(prodlim)
 # generate illness-death model based on exponentially

@@ -62,7 +62,7 @@ The algorithm needs least 5 knots and at most 20 knots.}
 \item{knots}{Argument only active for the penalized likelihood approach \code{method="Splines"}.
 There are three ways to control the placement of the knots between the smallest and the largest
 of all time points:
-\itemize{
+\describe{
  \item{\code{knots="equidistant"}}{Knots are placed with same distance on the time scale.}
  \item{\code{knots="quantiles"}}{Knots are placed such that the number of observations is roughly the same between knots.}
 \item{knots=list()}{List of 1 or 2 or three vectors. The list elements are the actual placements
@@ -186,7 +186,7 @@ fitRC <- idm(formula01=Hist(time=observed.illtime,event=seen.ill)~X1+X2,
              conf.int=FALSE)
 fitRC
 
-\dontrun{
+\donttest{
 set.seed(17)
 d <- simulateIDM(300)
 fitRC.splines <- idm(formula01=Hist(time=observed.illtime,event=seen.ill)~X1+X2,
@@ -201,7 +201,7 @@ fitIC <- idm(formula01=Hist(time=list(L,R),event=seen.ill)~X1+X2,
              conf.int=FALSE)
 fitIC
 
-\dontrun{
+\donttest{
 
     data(Paq1000)
 

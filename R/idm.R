@@ -45,7 +45,7 @@
 #' @param knots Argument only active for the penalized likelihood approach \code{method="Splines"}.
 #' There are three ways to control the placement of the knots between the smallest and the largest
 #' of all time points:
-#' \itemize{
+#' \describe{
 #'  \item{\code{knots="equidistant"}}{Knots are placed with same distance on the time scale.}
 #'  \item{\code{knots="quantiles"}}{Knots are placed such that the number of observations is roughly the same between knots.}
 #' \item{knots=list()}{List of 1 or 2 or three vectors. The list elements are the actual placements
@@ -156,7 +156,7 @@
 ##'              conf.int=FALSE)
 ##' fitRC
 ##'
-##' \dontrun{
+##' \donttest{
 ##' set.seed(17)
 ##' d <- simulateIDM(300)
 ##' fitRC.splines <- idm(formula01=Hist(time=observed.illtime,event=seen.ill)~X1+X2,
@@ -171,7 +171,7 @@
 ##'              conf.int=FALSE)
 ##' fitIC
 ##' 
-##' \dontrun{
+##' \donttest{
 ##' 
 ##'     data(Paq1000)
 ##' 
@@ -238,6 +238,14 @@ idm <- function(formula01,
     m02$formula <- formula02
     m12$formula <- formula12
     m01[[1]] <- m02[[1]] <- m12[[1]] <- as.name("model.frame")
+    ## dealing with missing data if no covariate on transition 0->2
+    if(anyNA(data)){
+      variables=unique(c(all.vars(formula01),all.vars(formula02),all.vars(formula12)))
+      data=data[,variables]
+      data=na.omit(data)
+      m01[[2]] <- m02[[2]] <- m12[[2]] <- data
+    }
+    
     m01 <- eval(m01,parent.frame())
     m02 <- eval(m02,parent.frame())
     m12 <- eval(m12,parent.frame())
@@ -260,7 +268,7 @@ idm <- function(formula01,
     ## formula02
     x02 <- model.matrix(formula02,data=m02)[, -1, drop = FALSE]
     NC02 <- NCOL(x02)
-    if (NC01>0)
+    if (NC02>0)
         Xnames02 <- colnames(x02)
     else
         Xnames02 <- NULL

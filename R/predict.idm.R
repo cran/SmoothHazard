@@ -44,9 +44,9 @@
 #' @keywords methods
 #' @examples
 #'
-#' \dontrun{
+#' \donttest{
 #' set.seed(100)
-#' d=simulateIDM(n = 100)
+#' d=simulateIDM(n = 200)
 #' fit <- idm(formula01=Hist(time=list(L,R),event=seen.ill)~X1+X2+X3,
 #'                formula02=Hist(time=observed.lifetime,event=seen.exit)~X1+X2+X3,
 #'                data=d,conf.int=FALSE)
@@ -158,9 +158,9 @@ predict.idm <- function(object,s,t,newdata,nsim=200,seed=21,conf.int=.95,lifeExp
         the01 <- object$theta01
         names(the01) <- paste0("the01.",1:length(the01))
         the02 <- object$theta02
-        names(the02) <- paste0("the02.",1:length(the01))
+        names(the02) <- paste0("the02.",1:length(the02))
         the12 <- object$theta12
-        names(the12) <- paste0("the12.",1:length(the01))
+        names(the12) <- paste0("the12.",1:length(the12))
         if (do.conf.int == TRUE){
             ### conf.int prediction by Monte-Carlo
             Vmean <- c(the01,the02,the12,beta01,beta02,beta12) # vector of estimates
@@ -362,7 +362,9 @@ Predict0.idmPl <- function(s,t,knots01,nknots01,the01,knots12,nknots12,the12,kno
     p01 <- sapply(t,function(t) {integrate(f=function(x){S.pl(s,x,knots01,nknots01,the01,bZ01)*S.pl(s,x,knots02,nknots02,the02,bZ02)*intensity(times=x,knots=knots01,number.knots=nknots01,theta=the01,linear.predictor=bZ01)$intensity*S.pl(x,t,knots12,nknots12,the12,bZ12)},lower=s,upper=t)$value})
     p02_1 <- 1-p00-p02_0-p01
     p02 <- p02_0+p02_1
-    list(p00=p00,p01=p01,p11=p11,p12=p12,p02_0=p02_0,p02_1=p02_1,p02=p02,F01=p01+p02_1,F0.=p02_0+p01+p02_1)
+    RM<- integrate(f = function(x) {S.pl(s, x, knots01, nknots01, the01, bZ01) * S.pl(s, x, knots02, nknots02, the02, bZ02) }, lower = s, upper = t)$value
+    F01<- integrate(f = function(x) {S.pl(s, x, knots01, nknots01, the01, bZ01) * S.pl(s, x, knots02, nknots02, the02, bZ02) * intensity(times = x, knots = knots01, number.knots = nknots01, theta = the01,linear.predictor = bZ01)$intensity }, lower = s, upper = t)$value
+    list(p00=p00,p01=p01,p11=p11,p12=p12,p02_0=p02_0,p02_1=p02_1,p02=p02,F01=F01,F0.=p02_0+p01+p02_1, RM=RM)
 }
 
 Predict0.idmWeib <- function(s,t,a01,b01,a02,b02,a12,b12,bZ01=0,bZ02=0,bZ12=0) {
@@ -373,8 +375,10 @@ Predict0.idmWeib <- function(s,t,a01,b01,a02,b02,a12,b12,bZ01=0,bZ02=0,bZ12=0) {
     p01 = sapply(t,function(t) {integrate(f=function(x){S.weib(s,x,a01,b01,bZ01)*S.weib(s,x,a02,b02,bZ02)*iweibull(x,a01,b01,bZ01)*S.weib(x,t,a12,b12,bZ12)},lower=s,upper=t)$value})
     p02_1 = 1-p00-p02_0-p01
     p02 = p02_0+p02_1
+    RM= integrate(f = function(x) {S.weib(s, x, a01, b01, bZ01) * S.weib(s, x, a02, b02, bZ02)}, lower = s, upper = t)$value
+    F01= integrate(f = function(x) {S.weib(s, x, a01, b01, bZ01) * S.weib(s, x, a02, b02, bZ02)*iweibull(x,a01,b01,bZ01)}, lower = s, upper = t)$value
     ## return(list(p00=p00,p01=p01,p11=p11,p12=p12,p02_0=p02_0,p02_1=p02_1,p02=p02,F01=p01+p02_1,F0.=p02_0+p01+p02_1))
-    list(p00=p00,p01=p01,p11=p11,p12=p12,p02_0=p02_0,p02_1=p02_1,p02=p02,F01=p01+p02_1,F0.=p02_0+p01+p02_1)
+    list(p00=p00,p01=p01,p11=p11,p12=p12,p02_0=p02_0,p02_1=p02_1,p02=p02,F01=F01,F0.=p02_0+p01+p02_1, RM=RM)
 }
 
 # a = shape parameter
@@ -439,37 +443,46 @@ S.pl <- function(s,t,zi,nknots,the,bZ=0) {
 
 lifexpect0.idmWeib <- function(s,a01,b01,a02,b02,a12,b12,bZ01=0,bZ02=0,bZ12=0,max) {
     ## print("lifexpect0.idmWeib")
-    max <- 100
+    # max <- 100
     ET12 = integrate(
         f=function(x) {
             S.weib(s,x,a12,b12,bZ12)
         },s,max)
     ET0dot = integrate(f=function(x) {
         S.weib(s,x,a01,b01,bZ01)*S.weib(s,x,a02,b02,bZ02)
-    },s,Inf)
+    },s,max)
     ET01 = integrate(f=function(x){
         sapply(x,function(x){
             integrate(f=function(y){
                 S.weib(s,y,a01,b01,bZ01)*S.weib(s,y,a02,b02,bZ02)*iweibull(y,a01,b01,bZ01)*S.weib(y,x,a12,b12,bZ12)},
                 lower=s,
                 upper=x)$value})},s,max)
-    list(LE.0=ET0dot$value,
-         LE.nondiseased=ET01$value+ET0dot$value,
-         LE.diseased=ET12$value)
+    LTR=integrate(f=function(x){
+      S.weib(s,x,a01,b01,bZ01)*S.weib(s,x,a02,b02,bZ02)*iweibull(x,a01,b01,bZ01)},s,max)
+    list(LE.00=ET0dot$value,
+         LE.0.=ET01$value+ET0dot$value,
+         LE.01=ET01$value,
+         LE.11=ET12$value,
+         LTR=LTR$value)
 
 }
 
 lifexpect0.idmPl <- function(s,knots01,nknots01,the01,knots12,nknots12,the12,knots02,nknots02,the02,bZ01=0,bZ12=0,bZ02=0) {
-    ET12 = integrate(f=function(x) {
-                         Predict0.idmPl(s,x,knots01,nknots01,the01,knots12,nknots12,the12,knots02,nknots02,the02,bZ01,bZ12,bZ02)[["p11"]]
-                     },s,knots12[nknots12+6])
-    ET0dot = integrate(f=function(x) {
-                           Predict0.idmPl(s,x,knots01,nknots01,the01,knots12,nknots12,the12,knots02,nknots02,the02,bZ01,bZ12,bZ02)[["p00"]]
-                       },s,knots02[nknots02+6])
-    ET01 = integrate(f=function(x) {
-                         Predict0.idmPl(s,x,knots01,nknots01,the01,knots12,nknots12,the12,knots02,nknots02,the02,bZ01,bZ12,bZ02)[["p01"]]
-                     },s,knots01[nknots01+6])
-    list(LE.0=ET0dot$value,
-         LE.nondiseased=ET01$value+ET0dot$value,
-         LE.diseased=ET12$value)
+  ET12 = integrate(f=function(x) {
+    S.pl(s,x,knots12,nknots12,the12,bZ12)},s,knots12[nknots12+6])
+  ET0dot = integrate(f=function(x) {
+    S.pl(s,x,knots01,nknots01,the01,bZ01)*S.pl(s,x,knots02,nknots02,the02,bZ02)  },s,knots02[nknots02+6])
+  ET01 = integrate(f=function(x) {
+    sapply(x,function(x) {integrate(f=function(y){
+      (S.pl(s,y,knots01,nknots01,the01,bZ01)
+       *S.pl(s,y,knots02,nknots02,the02,bZ02)*
+         intensity(times=y,knots=knots01,number.knots=nknots01,theta=the01,linear.predictor=bZ01)$intensity
+       *S.pl(y,x,knots12,nknots12,the12,bZ12))},
+      lower=s,upper=x)$value})},s,knots01[nknots01+6])
+  LTR=integrate(f = function(x) {S.pl(s, x, knots01, nknots01, the01, bZ01) * S.pl(s, x, knots02, nknots02, the02, bZ02) * intensity(times = x, knots = knots01, number.knots = nknots01, theta = the01,linear.predictor = bZ01)$intensity }, lower = s, upper = knots01[nknots01+6])$value
+  list(LE.00=ET0dot$value,
+       LE.0.=ET01$value+ET0dot$value,
+       LE.01=ET01$value,
+       LE.11=ET12$value,
+       LTR=LTR)
 }

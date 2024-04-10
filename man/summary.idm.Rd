@@ -20,13 +20,16 @@
 
 \item{\dots}{other unusued arguments.}
 }
+\value{
+No return value.
+}
 \description{
 Summarize the event history data of an illness-death regression model
 and show regression coefficients for transition intensities
 }
 \examples{
 
-\dontrun{
+\donttest{
 library(prodlim)
 data(Paq1000)
 fit.splines <-  idm(formula02=Hist(time=t,event=death,entry=e)~certif,

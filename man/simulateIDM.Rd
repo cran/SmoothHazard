@@ -9,6 +9,9 @@ simulateIDM(n = 100)
 \arguments{
 \item{n}{number of observations}
 }
+\value{
+Object with class \code{data.frame} which contains the simulated data.
+}
 \description{
 Simulate data from an illness-death model with interval censored event times and covariates
 }

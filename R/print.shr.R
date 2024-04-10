@@ -15,9 +15,10 @@
 #' Pierre Joly <Pierre.Joly@@isped.u-bordeaux2.fr>
 #' @seealso \code{\link{summary.shr}}, \code{\link{plot.shr}}
 #' @keywords methods
+#' @return No return value.
 #' @examples
 #' 
-#' \dontrun{
+#' \donttest{
 #' # a penalized survival model 
 #' library(prodlim)
 #' data(testdata)
@@ -80,5 +81,5 @@ print.shr <- function(x,conf.int=.95,digits=4,pvalDigits=4,eps=0.0001,...){
                "2"={ warning("Maximum number of iterations reached.",call.=FALSE)},
                "3"={ warning("Model did not converge.",call.=FALSE)})
     }
-
+    return(NULL)
 }

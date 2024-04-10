@@ -6,15 +6,15 @@
       implicit none 
       double precision ro,sx
       integer id
-      double precision x1,x2
+      double precision x1,x2,runiran
       double precision f,v1,v2,s,dls,ro2
       double precision dsqrt,log
 !      write(*,*)'dans bgos'
 
 5     continue
 
-      call random_number(harvest=x1)
-      call random_number(harvest=x2)   
+      x1=runiran()
+      x2=runiran()   
       if(id.ne.1) go to 10
       f=2.d0*dsqrt(3.d0)
       x1=(x1-0.5d0)*f
