@@ -4,14 +4,14 @@
 #' 
 #' 
 #' @param x Class \code{idm} object, i.e. the result of a call to the
-#' \code{\link{idm}} function with \code{intensities}="Weib".
+#' \link{idm} function with \code{intensities}="Weib".
 #' @param conf.int The level of confidence for the hazard ratios. The default is \code{0.95}.
 #' @param digits Number of digits to print.
 #' @param pvalDigits Number of digits to print for p-values.
 #' @param eps Passed to \code{format.pval}.
 #' @param \dots Not used.
 #' @author Celia Touraine <Celia.Touraine@@isped.u-bordeaux2.fr>, Thomas A. Gerds <tag@@biostat.ku.dk> 
-#' @seealso \code{\link{summary.idm}}, \code{\link{plot.idm}}
+#' @seealso \link{summary.idm}, \link{plot.idm}
 #' @keywords methods
 #' @return No return value.
 #' @examples

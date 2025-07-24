@@ -152,7 +152,7 @@ approximate by M-splines the intensity of the 1 --> 2 transition.}
 \item{theta02}{square root of splines coefficients for transition 0 --> 2.}
 \item{theta12}{square root of splines coefficients for transition 1 --> 2.}
 \item{CV}{a binary variable equals to 1 when search of the smoothing
-parameters \link{kappa} by approximated cross-validation, 1 otherwise. The
+parameters \code{kappa} by approximated cross-validation, 1 otherwise. The
 default is 0.} \item{kappa}{vector containing the smoothing parameters for
 transition 0 --> 1, 0 --> 2, 1 --> 2 used to estimate the model by the
 penalized likelihood approach.} \item{CVcrit}{cross validation criteria.}
@@ -230,9 +230,9 @@ of nonlinear parameters.  \emph{SIAM Journal of Applied Mathematics},
 431-441.
 }
 \seealso{
-\code{\link{print.idm}}
-\code{\link{summary.idm}}
-\code{\link{predict.idm}}
+\link{print.idm}
+\link{summary.idm}
+\link{predict.idm}
 }
 \author{
 R: Celia Touraine <Celia.Touraine@isped.u-bordeaux2.fr> Fortran:

@@ -82,15 +82,15 @@
 #' \item{knots}{knots of the M-splines estimate of the hazard function.}
 #' \item{nknots}{number of knots.}
 #' \item{CV}{a binary variable equals to 1 when search of the smoothing parameter
-#'          \link{kappa} by approximated cross-validation, 1 otherwise. The default is 0.}
+#'          \code{kappa} by approximated cross-validation, 1 otherwise. The default is 0.}
 #' \item{niter}{number of iterations.}
 #' \item{cv}{vector containing the convergence criteria.}
 #' \item{na.action}{observations deleted if missing values.}
 #' }
 #' @author R: Celia Touraine \email{celia.touraine@icm.unicancer.fr} Fortran:
 #' Pierre Joly \email{Pierre.Joly@@isped.u-bordeaux2.fr}
-#' @seealso \code{\link{shr}}, \code{\link{print.shr}},
-#' \code{\link{summary.shr}}, \code{\link{print.shr}},
+#' @seealso \link{shr}, \link{print.shr},
+#' \link{summary.shr}, \link{print.shr},
 #' @references D. Marquardt (1963). An algorithm for least-squares estimation
 #' of nonlinear parameters.  \emph{SIAM Journal of Applied Mathematics},
 #' 431-441.

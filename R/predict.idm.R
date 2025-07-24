@@ -8,7 +8,7 @@
 #' of class \code{idmSplines} with confidence intervals are calculated.
 #' 
 #' @param object an \code{idm} class objects returned by a call to the
-#'     \code{\link{idm}} function
+#'     \link{idm} function
 #' @param s time point at which prediction is made.
 #' @param t time horizon for prediction.
 #' @param newdata A data frame with covariate values for prediction.
@@ -40,7 +40,7 @@
 #' @author R: Celia Touraine <Celia.Touraine@@isped.u-bordeaux2.fr>
 #'     and Thomas Alexander Gerds <tag@@biostat.ku.dk> Fortran: Pierre
 #'     Joly <Pierre.Joly@@isped.u-bordeaux2.fr>
-#' @seealso \code{\link{idm}}
+#' @seealso \link{idm}
 #' @keywords methods
 #' @examples
 #'

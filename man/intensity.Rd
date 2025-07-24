@@ -73,7 +73,7 @@ intensity(times = fit.su$time, knots = fit.su$knots,
 }
 }
 \seealso{
-\code{\link{shr}}, \code{\link{idm}}
+\link{shr}, \link{idm}
 }
 \author{
 R: Celia Touraine <Celia.Touraine@isped.u-bordeaux2.fr> and Thomas Alexander Gerds <tag@biostat.ku.dk>

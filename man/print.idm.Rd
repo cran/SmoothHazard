@@ -8,7 +8,7 @@
 }
 \arguments{
 \item{x}{Class \code{idm} object, i.e. the result of a call to the
-\code{\link{idm}} function with \code{intensities}="Weib".}
+\link{idm} function with \code{intensities}="Weib".}
 
 \item{conf.int}{The level of confidence for the hazard ratios. The default is \code{0.95}.}
 
@@ -40,7 +40,7 @@ print(fit.splines)
 }
 }
 \seealso{
-\code{\link{summary.idm}}, \code{\link{plot.idm}}
+\link{summary.idm}, \link{plot.idm}
 }
 \author{
 Celia Touraine <Celia.Touraine@isped.u-bordeaux2.fr>, Thomas A. Gerds <tag@biostat.ku.dk>

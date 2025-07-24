@@ -8,7 +8,7 @@
 }
 \arguments{
 \item{object}{a \code{idmSplines} object, i.e., the result of a call to the
-\code{\link{idm}} function with \code{intensities}="Splines".}
+\link{idm} function with \code{intensities}="Splines".}
 
 \item{conf.int}{The level of confidence for the hazard ratios. The default is \code{0.95}.}
 
@@ -41,8 +41,8 @@ summary(fit.splines)
 }
 }
 \seealso{
-\code{\link{idm}}, \code{\link{print.idm}},
-\code{\link{plot.idm}}
+\link{idm}, \link{print.idm},
+\link{plot.idm}
 }
 \author{
 R: Celia Touraine <Celia.Touraine@isped.u-bordeaux2.fr> Fortran:

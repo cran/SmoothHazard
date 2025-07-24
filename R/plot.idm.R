@@ -17,14 +17,14 @@
 #' @param ylim Limits for y-axis
 #' @param xlab Label for x-axis
 #' @param ylab Label for y-axis
-#' @param legend If TRUE a legend is drawn, which can be further controlled via \code{\link{SmartControl}}.
+#' @param legend If TRUE a legend is drawn, which can be further controlled via \link[prodlim]{SmartControl}.
 #' @param transition Choose one of the transition intensities: \code{c("01","02","12")}.
-#' @param ... Passed to \code{\link{SmartControl}}
+#' @param ... Passed to \link[prodlim]{SmartControl}
 #' @return Print a plot of the baseline transition intensities of an
 #' illness-death model estimated using a Weibull approach.
 #' @seealso
-#' \code{\link{print.idm}},\code{\link{summary.idm}},\code{\link{idm}},
-#' @seealso \code{\link{idm}}
+#' \link{print.idm},\link{summary.idm},\link{idm},
+#' @seealso \link{idm}
 #' @keywords methods
 #' @examples
 #'

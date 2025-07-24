@@ -8,7 +8,7 @@
 }
 \arguments{
 \item{object}{a \code{shr} object, i.e., the result of a call to the
-\code{\link{shr}} function.}
+\link{shr} function.}
 
 \item{conf.int}{The level of confidence for the hazard ratios. The default is \code{0.95}.}
 
@@ -43,8 +43,8 @@ summary(fit.su)
 }
 }
 \seealso{
-\code{\link{shr}}, \code{\link{print.shr}},
-\code{\link{plot.shr}}
+\link{shr}, \link{print.shr},
+\link{plot.shr}
 }
 \author{
 Celia Touraine <Celia.Touraine@isped.u-bordeaux2.fr>

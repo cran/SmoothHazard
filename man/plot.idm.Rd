@@ -48,11 +48,11 @@
 
 \item{ylab}{Label for y-axis}
 
-\item{legend}{If TRUE a legend is drawn, which can be further controlled via \code{\link{SmartControl}}.}
+\item{legend}{If TRUE a legend is drawn, which can be further controlled via \link[prodlim]{SmartControl}.}
 
 \item{transition}{Choose one of the transition intensities: \code{c("01","02","12")}.}
 
-\item{...}{Passed to \code{\link{SmartControl}}}
+\item{...}{Passed to \link[prodlim]{SmartControl}}
 }
 \value{
 Print a plot of the baseline transition intensities of an
@@ -86,8 +86,8 @@ plot(fit.weib)
 
 }
 \seealso{
-\code{\link{print.idm}},\code{\link{summary.idm}},\code{\link{idm}},
+\link{print.idm},\link{summary.idm},\link{idm},
 
-\code{\link{idm}}
+\link{idm}
 }
 \keyword{methods}

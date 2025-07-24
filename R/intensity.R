@@ -3,9 +3,9 @@
 ## author: Thomas Alexander Gerds
 ## created: Feb  6 2016 (08:47) 
 ## Version: 
-## last-updated: Apr  2 2024 (18:04) 
+## last-updated: Jul 24 2025 (09:15) 
 ##           By: Thomas Alexander Gerds
-##     Update #: 29
+##     Update #: 30
 #----------------------------------------------------------------------
 ## 
 ### Commentary: 
@@ -43,7 +43,7 @@
 ##' \item{cumulative.intensity}{The cumulative transition intensity function evaluated at \code{times}}
 ##' \item{survival}{The "survival" function, i.e., exp(-cumulative.intensity)}
 ##' 
-##' @seealso \code{\link{shr}}, \code{\link{idm}} 
+##' @seealso \link{shr}, \link{idm} 
 ##' @examples
 ##' data(testdata)
 ##' fit.su <- shr(Hist(time=list(l, r), id) ~ cov,

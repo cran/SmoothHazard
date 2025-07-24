@@ -4,7 +4,7 @@
 ##' a latent variable model with a latent time
 ##' and a censoring mechanism (censtime, inspection1,inspection2,...,inspectionK).
 ##' 
-##' The function \code{\link{sim.survIC}} then simulates
+##' The function \link{sim.survIC} then simulates
 ##' interval censored times.
 ##'
 ##' @title Generate survival model objects

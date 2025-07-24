@@ -5,7 +5,7 @@
 #' 
 #' 
 #' @param x a \code{shr} object, i.e., the result of a call to the
-#' \code{\link{shr}} function with \code{hazard}="Splines".
+#' \link{shr} function with \code{hazard}="Splines".
 #' @param conf.int The level of confidence for the hazard ratios. The default is \code{0.95}.
 #' @param digits number of digits to print.
 #' @param pvalDigits number of digits to print for p-values.
@@ -13,7 +13,7 @@
 #' @param \dots other unusued arguments.
 #' @author R: Celia Touraine <Celia.Touraine@@isped.u-bordeaux2.fr> Fortran:
 #' Pierre Joly <Pierre.Joly@@isped.u-bordeaux2.fr>
-#' @seealso \code{\link{summary.shr}}, \code{\link{plot.shr}}
+#' @seealso \link{summary.shr}, \link{plot.shr}
 #' @keywords methods
 #' @return No return value.
 #' @examples

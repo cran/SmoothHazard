@@ -8,7 +8,7 @@
 }
 \arguments{
 \item{x}{a \code{shr} object, i.e., the result of a call to the
-\code{\link{shr}} function with \code{hazard}="Splines".}
+\link{shr} function with \code{hazard}="Splines".}
 
 \item{conf.int}{The level of confidence for the hazard ratios. The default is \code{0.95}.}
 
@@ -38,7 +38,7 @@ print(fit.su)
 }
 }
 \seealso{
-\code{\link{summary.shr}}, \code{\link{plot.shr}}
+\link{summary.shr}, \link{plot.shr}
 }
 \author{
 R: Celia Touraine <Celia.Touraine@isped.u-bordeaux2.fr> Fortran:

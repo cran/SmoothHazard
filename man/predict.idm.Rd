@@ -20,7 +20,7 @@ approach or a Weibull parametrization.}
 }
 \arguments{
 \item{object}{an \code{idm} class objects returned by a call to the
-\code{\link{idm}} function}
+\link{idm} function}
 
 \item{s}{time point at which prediction is made.}
 
@@ -99,7 +99,7 @@ predict(fit.splines,s=70,t=80,lifeExpect=TRUE,newdata=data.frame(certif=1),nsim=
 
 }
 \seealso{
-\code{\link{idm}}
+\link{idm}
 }
 \author{
 R: Celia Touraine <Celia.Touraine@isped.u-bordeaux2.fr>

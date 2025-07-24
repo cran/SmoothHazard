@@ -104,7 +104,7 @@ is na.omit. Another possible value is NULL.}
 \item{knots}{knots of the M-splines estimate of the hazard function.}
 \item{nknots}{number of knots.}
 \item{CV}{a binary variable equals to 1 when search of the smoothing parameter
-         \link{kappa} by approximated cross-validation, 1 otherwise. The default is 0.}
+         \code{kappa} by approximated cross-validation, 1 otherwise. The default is 0.}
 \item{niter}{number of iterations.}
 \item{cv}{vector containing the convergence criteria.}
 \item{na.action}{observations deleted if missing values.}
@@ -147,8 +147,8 @@ of nonlinear parameters.  \emph{SIAM Journal of Applied Mathematics},
 431-441.
 }
 \seealso{
-\code{\link{shr}}, \code{\link{print.shr}},
-\code{\link{summary.shr}}, \code{\link{print.shr}},
+\link{shr}, \link{print.shr},
+\link{summary.shr}, \link{print.shr},
 }
 \author{
 R: Celia Touraine \email{celia.touraine@icm.unicancer.fr} Fortran:

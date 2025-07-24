@@ -4,7 +4,7 @@
 ##' a latent variable model (latent illtime, waittime and lifetime)
 ##' and censoring mechanism (censtime, inspection1,inspection2,...,inspectionK).
 ##' 
-##' The function \code{\link{sim.idmModel}} then simulates
+##' The function \link{sim.idmModel} then simulates
 ##' right censored lifetimes and interval censored illness times.
 ##'
 ##' @title Generate illness-death model objects

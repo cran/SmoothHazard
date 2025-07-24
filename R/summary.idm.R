@@ -4,7 +4,7 @@
 #' and show regression coefficients for transition intensities
 #' 
 #' @param object a \code{idmSplines} object, i.e., the result of a call to the
-#' \code{\link{idm}} function with \code{intensities}="Splines".
+#' \link{idm} function with \code{intensities}="Splines".
 #' @param conf.int  The level of confidence for the hazard ratios. The default is \code{0.95}.
 #' @param digits number of digits to print.
 #' @param pvalDigits number of digits to print for p-values.
@@ -12,8 +12,8 @@
 #' @param \dots other unusued arguments.
 #' @author R: Celia Touraine <Celia.Touraine@@isped.u-bordeaux2.fr> Fortran:
 #' Pierre Joly <Pierre.Joly@@isped.u-bordeaux2.fr>
-#' @seealso \code{\link{idm}}, \code{\link{print.idm}},
-#' \code{\link{plot.idm}} 
+#' @seealso \link{idm}, \link{print.idm},
+#' \link{plot.idm} 
 #' @keywords methods
 #' @return No return value.
 #' @examples
